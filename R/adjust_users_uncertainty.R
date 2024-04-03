@@ -151,9 +151,9 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     data = model_data,
     parameters.to.save = model_parameters,
     model.file = textConnection(model_code),
-    n.iter = 50000,
-    n.burnin = 10000,
-    n.thin = 20,
+    n.iter = 2000,
+    n.burnin = 1000,
+    n.chains = 4,
     DIC = FALSE)
 
   # Pull out posterior samples
