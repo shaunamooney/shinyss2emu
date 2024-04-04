@@ -83,7 +83,7 @@ country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_s
   all_emu_out <- emu_samps %>% group_by(sample_id, name, ss_type) %>% mutate(delta_emu = emu - lag(emu))
 
   overall_emu <- all_emu_out %>%
-    group_by(name, ss_type, year) %>%
+    group_by(name, pop_type, ss_type, year) %>%
     summarise(median_emu = median(emu),
               emu_roc = median(delta_emu),
               sd_emu = sd(emu),
