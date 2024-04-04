@@ -12,6 +12,7 @@
 
 get_tools_info <- function(country_file_path){
 
+  #browser()
   # Country level information ------------------------------------------------
 
   # Pop_Prev tab
@@ -132,6 +133,9 @@ get_tools_info <- function(country_file_path){
 
   # FPsource - Sectors Reporting ---------------------------------------------
   test_sheet4 <- as.matrix(read_excel(country_file_path, sheet = "4. FPSource Set Up"))
+
+  user_input_adjustment_table <- tibble(method_overview = test_sheet4[168:189,3], include_adjustment = test_sheet4[168:189,8]) %>% drop_na(method_overview) %>% distinct()
+
 
   # Pattern to be matched
   pat_en <- "Method"
@@ -938,6 +942,7 @@ get_tools_info <- function(country_file_path){
                                                                                                                   ifelse(ss_type == "Visits", "FP visits", ss_type))))),
     ss_info = ss_info,
     cyp_table = cyp_table,
-    method_continuation_data = clients_method_continuation
+    method_continuation_data = clients_method_continuation,
+    user_input_adjustment_table = user_input_adjustment_table
   ))
 }

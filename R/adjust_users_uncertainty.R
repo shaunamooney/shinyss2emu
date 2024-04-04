@@ -10,7 +10,7 @@
 #' @export
 #'
 
-adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up, incl_condoms, reporting_rates_df, baseline_users, commodities_table, method_continuation_df) {
+adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up, reporting_rates_df, baseline_users, commodities_table, method_continuation_df, user_input_adjustment_table) {
 
   s <- reporting_rates_df %>% pull(ss_type) %>% unique()
 
@@ -30,9 +30,9 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     country_name <- "Congo Democratic Republic"
   }
 
-  country_fp_souce_data <- long_fp_source_data %>% filter(Country == country_name) %>% filter(year %in% emu_years)
+  country_fp_source_data <- long_fp_source_data %>% filter(Country == country_name) %>% filter(year %in% emu_years)
 
-  FP_source_data_temporal <- country_fp_souce_data %>%
+  FP_source_data_temporal <- country_fp_source_data %>%
     mutate(method_overview = ifelse(method_overview == "OC Pills", "Pill",
                                     ifelse(method_overview == "EC", "Emergency contraception", method_overview)))
 
@@ -93,7 +93,9 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     mutate(method_overview = ifelse(method_overview == "Implants", "Implant",
                                     ifelse(method_overview == "Injectables", "Injectable",
                                            ifelse(method_overview == "OC Pills", "Pill",
-                                                  ifelse(method_overview == "EC", "Emergency contraception", method_overview)))))
+                                                  ifelse(method_overview == "EC", "Emergency contraception",
+                                                         ifelse(method_overview == "Female Sterilization", "Sterilization (F)", method_overview))))))
+
 
 
 
@@ -253,11 +255,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
                           ungroup()
 
 
- if(incl_condoms == FALSE){
-   #adj_factor_table <- adj_factor_table %>% mutate(adj_factor = ifelse(method_detail %in% c("Male Condom", "Female Condom"), 1, adj_factor)) # COME BACK TO THIS
 
-   fixed_inverse_adjustment_table <- fixed_inverse_adjustment_table %>% mutate(fixed_inv_adj_factor = ifelse(method_overview %in% c("Male Condom", "Female Condom"), 1, fixed_inv_adj_factor))
- }
 
   if(s == "FP users"){
     users_table_overview_fixed <- commodities_table %>%
@@ -266,7 +264,9 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
                    names_to = "year",
                    values_to = "count") %>%
       mutate(year = as.numeric(year)) %>%
-      mutate(current_users = count)
+      mutate(current_users = count) %>% mutate(method_overview = ifelse(method_overview == "Female Sterilization", "Sterilization (F)",
+                                                                        ifelse(method_overview == "Male Condom", "Condom (M)", method_overview)))
+
   }
 
  else {
@@ -296,11 +296,13 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
      mutate(year = as.numeric(year)) %>%
      group_by(method_detail) %>%
      mutate(year_index = 1:n()) %>%
-     ungroup()
+     ungroup() %>% mutate(method_overview = ifelse(method_detail == "Tubal Ligation (F)", "Sterilization (F)",
+                                                   ifelse(method_detail == "Male Condom", "Condom (M)", method_overview)))
+
 
    commodities_table_ltm_fixed <- commodities_table_overview_fixed %>% filter(method_type == "Long") #%>% drop_na(count)
 
-   commodities_table_ltm_join_temp_fixed <- left_join(commodities_table_ltm_fixed,method_continuation_df_long)
+   commodities_table_ltm_join_temp_fixed <- left_join(commodities_table_ltm_fixed,method_continuation_df_long %>% mutate(method_overview = ifelse(method_detail == "Tubal Ligation (F)", "Sterilization (F)",method_overview)))
    commodities_table_ltm_join_fixed <- left_join(commodities_table_ltm_join_temp_fixed, baseline_users_long)
    commodities_table_ltm_join_fixed <- commodities_table_ltm_join_fixed %>% mutate(baseline_users = ifelse(is.na(baseline_users), 0, baseline_users))
 
@@ -314,7 +316,8 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
      mutate(grouping_index = unique(year_index):n_years) %>%
      arrange(grouping_index) %>%
      group_by(method_detail,grouping_index) %>%
-     summarise(year = max(year), new_count = sum(count[1:max(grouping_index)]*continuation[max(grouping_index):1], na.rm = TRUE)) %>% rename(year_index = grouping_index)
+     summarise(year = max(year), new_count = sum(count[1:max(grouping_index)]*continuation[max(grouping_index):1], na.rm = TRUE)) %>%
+     rename(year_index = grouping_index)
 
    commodities_table_ltm_overview_fixed <- left_join(commodities_table_ltm_join_fixed, commodities_table_ltm_totalled_fixed) %>%
      mutate(current_users = new_count + baseline_users)
@@ -334,8 +337,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
  # USING INVERSE ADJUSTMENT FACTOR --------------------------------------------
  users_table_overview_fixed <- users_table_overview_fixed %>%
-   mutate(method_overview = ifelse(method_detail == "Tubal Ligation (F)", "Female Sterilization",
-                                   ifelse(method_detail == "Vasectomy (M)", "Male Sterilization", method_overview)))
+   mutate(method_overview = ifelse(method_detail == "Vasectomy (M)", "Male Sterilization", method_overview))
 
   inverse_adjustment_table <- adj_factor_table %>%
    #mutate(adj_factor = ifelse(adj_factor > 1, 1, ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor)))) %>%
@@ -363,6 +365,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   users_adj_df_fixed <- users_adj_df_fixed %>%
     drop_na(count)
 
+
   users_inc_private_sector_df <- users_adj_df %>%
     mutate(inv_adj_factor = ifelse(is.na(inv_adj_factor), 1, inv_adj_factor)) %>%
     mutate(total_users = current_users*inv_adj_factor) %>% filter(total_users > 0)
@@ -370,6 +373,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   users_inc_private_sector_df_fixed <- users_adj_df_fixed %>%
     mutate(fixed_inv_adj_factor = ifelse(is.na(fixed_inv_adj_factor), 1, fixed_inv_adj_factor)) %>%
     mutate(total_users = current_users*fixed_inv_adj_factor) %>% filter(total_users > 0)
+
 
   # ----------------------------------------------------------------------------
   return(list(users_incl_private = users_inc_private_sector_df,

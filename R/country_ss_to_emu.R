@@ -30,6 +30,8 @@ country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_s
     long_term_rates <- ss_tools_info$method_continuation_data %>%
       mutate_at(vars(-(1:2)), as.numeric)
 
+    user_input_adjustment_table <- ss_tools_info$user_input_adjustment_table
+
     Country <- setup_data$Country
 
     cyp_table_clean <- cyp_table %>%
@@ -51,11 +53,11 @@ country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_s
 
     uncertainty_adjust <- adjust_users_uncertainty(recode_sectors_reporting,
                                                    setup_data,
-                                                   incl_condoms,
                                                    reporting_rates,
                                                    baseline_users,
                                                    ss_data,
-                                                   long_term_rates)
+                                                   long_term_rates,
+                                                   user_input_adjustment_table)
 
 
     adjust_users_priv_sector <- uncertainty_adjust$users_incl_private
@@ -90,5 +92,5 @@ country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_s
               sd_emu_roc = sd(delta_emu, na.rm = TRUE)) %>%
     arrange(ss_type) %>% rename(emu = median_emu) %>% filter(emu <= 1)
 
-  return(overall_emu)
+  return(fixed_emu)
 }
