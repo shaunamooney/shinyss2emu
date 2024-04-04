@@ -87,7 +87,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   FP_source_data_long <- FP_source_data_long %>% mutate(sector_category = ifelse(sector == "Public Medical Sector", "public",
                                                                                  ifelse(sector %in% c("NGO", "Private Hospital/ Clinic Delivery", "Pharmacy"), "private", "other"))) %>% mutate(name = Country)
   supply_share_sd <- supply_share_sd %>%
-    mutate(year = floor(average_year)) %>%
+    mutate(year = ceiling(average_year)) %>%
     filter(name == country_name) %>%
     filter(year %in% emu_years) %>%
     mutate(method_overview = ifelse(method_overview == "Implants", "Implant",
@@ -264,8 +264,8 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
                    names_to = "year",
                    values_to = "count") %>%
       mutate(year = as.numeric(year)) %>%
-      mutate(current_users = count) %>% mutate(method_overview = ifelse(method_overview == "Female Sterilization", "Sterilization (F)",
-                                                                        ifelse(method_overview == "Male Condom", "Condom (M)", method_overview)))
+      mutate(current_users = count) %>% mutate(method_overview = ifelse(method_detail == "Tubal Ligation (F)", "Sterilization (F)",
+                                                                        ifelse(method_detail == "Male Condom", "Condom (M)", method_overview)))
 
   }
 
@@ -373,7 +373,6 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   users_inc_private_sector_df_fixed <- users_adj_df_fixed %>%
     mutate(fixed_inv_adj_factor = ifelse(is.na(fixed_inv_adj_factor), 1, fixed_inv_adj_factor)) %>%
     mutate(total_users = current_users*fixed_inv_adj_factor) %>% filter(total_users > 0)
-
 
   # ----------------------------------------------------------------------------
   return(list(users_incl_private = users_inc_private_sector_df,
