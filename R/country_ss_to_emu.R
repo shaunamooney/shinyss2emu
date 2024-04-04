@@ -6,7 +6,7 @@
 #' @import stringr
 #' @export
 
-country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_summary = FALSE){
+country_ss_to_emu <- function(country_tools_info, method_summary = FALSE){
 
   ss_tools_info <- country_tools_info
   country_emu_df <- list()
@@ -31,6 +31,7 @@ country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_s
       mutate_at(vars(-(1:2)), as.numeric)
 
     user_input_adjustment_table <- ss_tools_info$user_input_adjustment_table
+    include_condoms_df <- ss_tools_info$include_condoms_df %>% filter(ss_type == s)
 
     Country <- setup_data$Country
 
@@ -64,7 +65,7 @@ country_ss_to_emu <- function(country_tools_info, incl_condoms = FALSE, method_s
 
     fixed_adjust_users_priv_sector <- uncertainty_adjust$user_incl_private_fixed
 
-    total_adj_users <- total_adjusted_users(adjust_users_priv_sector, fixed_adjust_users_priv_sector, incl_condoms, method_summary)
+    total_adj_users <- total_adjusted_users(adjust_users_priv_sector, fixed_adjust_users_priv_sector, include_condoms_df, method_summary)
 
     total_users <- total_adj_users$total_emu_df
     total_fixed_users <- total_adj_users$fixed_total_emu_df

@@ -7,10 +7,10 @@
 #' @return Returns a table of adjusted users that is totalled for LAPM and STM methods.
 #' @examples
 #' total_adjusted_users(adj_users_kenya_comm_clients)
-total_adjusted_users <- function(adjusted_users_df, fixed_adjusted_users_df, incl_condoms, method_summary) {
+total_adjusted_users <- function(adjusted_users_df, fixed_adjusted_users_df, include_condoms_df, method_summary) {
 
   # remove condoms users from dataset
-  if(incl_condoms == FALSE){
+  if(include_condoms_df$include_exclude_condoms == "Exclude Condoms"){
     adjusted_users_df <- adjusted_users_df %>% filter(!(method_detail %in% c("Male Condom", "Female Condom")))
     fixed_adjusted_users_df <- fixed_adjusted_users_df %>% filter(!(method_detail %in% c("Male Condom", "Female Condom")))
   }

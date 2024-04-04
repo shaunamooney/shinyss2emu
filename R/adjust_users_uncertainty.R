@@ -365,6 +365,12 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   users_adj_df_fixed <- users_adj_df_fixed %>%
     drop_na(count)
 
+  user_input_no_adjustment_methods <- user_input_adjustment_table %>% filter(include_adjustment == "No") %>% pull(method_overview)
+
+  if(length(user_input_no_adjustment_methods) > 0 ){
+    users_adj_df <- users_adj_df %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
+    users_adj_df_fixed <- users_adj_df_fixed %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
+  }
 
   users_inc_private_sector_df <- users_adj_df %>%
     mutate(inv_adj_factor = ifelse(is.na(inv_adj_factor), 1, inv_adj_factor)) %>%

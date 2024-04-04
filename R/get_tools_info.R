@@ -557,7 +557,7 @@ get_tools_info <- function(country_file_path){
 
 
 
-    #test_clients[21:27, 121:137]
+
 
     }
 
@@ -930,6 +930,20 @@ get_tools_info <- function(country_file_path){
                                                                           ifelse(method_detail %in% c("Noristerat (NET-En)", "Lunelle", "Other Injectable"), 0.05,
                                                                                  ifelse(method_overview %in% c("Sterilization"), 0.025, 0.025))))))))))
 
+
+
+  clients_output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Output")
+  fac_output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Output")
+  users_output_data <- readxl::read_excel(country_file_path, sheet = "Users Output")
+  visits_output_data <- readxl::read_excel(country_file_path, sheet = "Visits Output")
+
+  clients_condoms <- clients_output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
+  fac_condoms <- fac_output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
+  users_condoms <- users_output_data[99,2] %>% mutate(ss_type = "FP users")
+  visits_condoms <- visits_output_data[99,2] %>% mutate(ss_type = "FP visits")
+
+  condoms_include_df <- rbind(clients_condoms, fac_condoms, users_condoms, visits_condoms) %>% rename(include_exclude_condoms = 1)
+
   return(list(
     ss_quantity_data = ss_quantity_data,
     pop_dataset = pop_dataset,
@@ -943,6 +957,7 @@ get_tools_info <- function(country_file_path){
     ss_info = ss_info,
     cyp_table = cyp_table,
     method_continuation_data = clients_method_continuation,
-    user_input_adjustment_table = user_input_adjustment_table
+    user_input_adjustment_table = user_input_adjustment_table,
+    include_condoms_df = condoms_include_df
   ))
 }
