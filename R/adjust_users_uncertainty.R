@@ -153,8 +153,8 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     data = model_data,
     parameters.to.save = model_parameters,
     model.file = textConnection(model_code),
-    n.iter = 2000,
-    n.burnin = 1000,
+    n.iter = 1000,
+    n.burnin = 500,
     n.chains = 4,
     DIC = FALSE)
 

@@ -6,16 +6,27 @@
 #' @import stringr
 #' @export
 
-country_ss_to_emu <- function(country_tools_info, method_summary = FALSE){
+country_ss_to_emu <- function(country_tools_info, method_summary = FALSE, shiny_input_type = NULL){
 
   ss_tools_info <- country_tools_info
   country_emu_df <- list()
   fixed_country_emu_df <- list()
 
-  ss_data_types <- c("Contraceptive commodities distributed to clients",
-                     "Contraceptive commodities distributed to facilities",
-                     "FP visits",
-                     "FP users")
+  if(is.null(shiny_input_type)){
+    ss_data_types <- c("Contraceptive commodities distributed to clients",
+                       "Contraceptive commodities distributed to facilities",
+                       "FP visits",
+                       "FP users")
+  }
+
+  else{
+
+    ss_data_types <- ifelse(shiny_input_type == "Clients", "Contraceptive commodities distributed to clients",
+                       ifelse(shiny_input_type == "Facilities", "Contraceptive commodities distributed to facilities",
+                              ifelse(shiny_input_type == "Users", "FP users",
+                                     ifelse(shiny_input_type == "Visits", "FP visits", "Unknown"))))
+
+  }
 
   for(s in ss_data_types) {
 

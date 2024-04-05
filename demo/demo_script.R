@@ -4,4 +4,4 @@ new_tool_filepath <- "~/Documents/GitHub/emu_output_analysis/data/SS to EMU Tool
 
 test_new_tools <- get_tools_info(new_tool_filepath)
 
-test_emu_dataset <- country_ss_to_emu(test_new_tools)
+test_emu_dataset <- country_ss_to_emu(test_new_tools, shiny_input_type = "Clients")
