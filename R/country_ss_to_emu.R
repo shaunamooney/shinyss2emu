@@ -75,8 +75,24 @@ country_ss_to_emu <- function(country_tools_info, method_summary = FALSE){
 
     ss_type_number <- match(s, ss_data_types)
 
-    country_emu_df[[ss_type_number]] <- emu_data$emu_samps
-    fixed_country_emu_df[[ss_type_number]] <- emu_data$fixed_emu
+    if(Country == "DR Congo"){
+      country_name <- "Democratic Republic of the Congo"
+    }
+
+    else if(Country == "Tanzania"){
+      country_name <- "United Republic of Tanzania"
+    }
+    else{
+      country_name <- Country
+    }
+
+    country_code <- country_code_data %>% filter(Country == country_name) %>% pull(division_numeric_code)
+
+    if(length(country_code) == 0){
+      country_code <- NA
+    }
+    country_emu_df[[ss_type_number]] <- emu_data$emu_samps %>% mutate(division_numeric_code = country_code)
+    fixed_country_emu_df[[ss_type_number]] <- emu_data$fixed_emu %>% mutate(division_numeric_code = country_code)
 
 
   }
@@ -86,7 +102,7 @@ country_ss_to_emu <- function(country_tools_info, method_summary = FALSE){
   all_emu_out <- emu_samps %>% group_by(sample_id, name, ss_type) %>% mutate(delta_emu = emu - lag(emu))
 
   overall_emu <- all_emu_out %>%
-    group_by(name, pop_type, ss_type, year) %>%
+    group_by(division_numeric_code, name, pop_type, ss_type, year) %>%
     summarise(median_emu = median(emu),
               emu_roc = median(delta_emu),
               sd_emu = sd(emu),

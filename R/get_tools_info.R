@@ -944,6 +944,20 @@ get_tools_info <- function(country_file_path){
 
   condoms_include_df <- rbind(clients_condoms, fac_condoms, users_condoms, visits_condoms) %>% rename(include_exclude_condoms = 1)
 
+  user_input_adjustment_table <- user_input_adjustment_table %>% mutate(method_overview = ifelse(method_overview == "Stérilisation (F)", "Sterilization (F)",
+                                                                                                 ifelse(method_overview == "Stérilisation (M)", "Sterilization (M)",
+                                                                                                        ifelse(method_overview == "DIU", "IUD",
+                                                                                                               ifelse(method_overview == "Produits injectables", "Injectable",
+                                                                                                                      ifelse(method_overview == "Pilule", "Pill",
+                                                                                                                             ifelse(method_overview == "Préservatifs (M)", "Condom (M)",
+                                                                                                                                    ifelse(method_overview == "Préservatifs (F)", "Condom (F)",
+                                                                                                                                           ifelse(method_overview == "Autres Méthodes Modernes", "Other Modern Methods",
+                                                                                                                                                  ifelse(method_overview == "Contraception d'urgence", "Emergency contraception", method_overview)))))))))) %>%
+    mutate(include_adjustment = ifelse(include_adjustment == "Oui", "Yes",
+                                       ifelse(include_adjustment == "Non", "No", include_adjustment)))
+
+  condoms_include_df <- condoms_include_df %>% mutate(include_exclude_condoms = ifelse(grepl("exc", ignore.case = TRUE, include_exclude_condoms), "Exclude Condoms", "Include Condoms"))
+
   return(list(
     ss_quantity_data = ss_quantity_data,
     pop_dataset = pop_dataset,
