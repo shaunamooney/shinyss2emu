@@ -369,7 +369,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
   if(length(user_input_no_adjustment_methods) > 0 ){
     users_adj_df <- users_adj_df %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
-    users_adj_df_fixed <- users_adj_df_fixed %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
+    users_adj_df_fixed <- users_adj_df_fixed %>% mutate(fixed_inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, fixed_inv_adj_factor))
   }
 
   users_inc_private_sector_df <- users_adj_df %>%
