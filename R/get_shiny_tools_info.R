@@ -13,9 +13,6 @@
 
 get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
-  #browser()
-  # Country level information ------------------------------------------------
-
   # Pop_Prev tab
   # Read the sheet names from the Excel file
   sheet_names <- readxl::excel_sheets(country_file_path)
@@ -297,10 +294,6 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     tidyr::pivot_wider(id_cols = ss_type, names_from = year, values_from = reporting_rate) %>% rename(ss_type = ss_type)
 
 
-
-  #reporting_rates <- reporting_rates_table(reporting_rates_data, s)
-
-
   # SS type input data
 
   # Service statistics info data
@@ -451,13 +444,6 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     mutate(data_exists = ifelse(is.na(ss_info$`Do you have data on contraceptive commodities?`) |
                                   ss_info$`Do you have data on contraceptive commodities?` %in% c("No", "Non"), "No", "Yes"
     ))
-
-  #ss_info <- ss_info %>% filter(ss_type == s)
-
-  #if ("No" %in% ss_info$data_exists) {
-  #  print("Data type doesn't exist")
-  #  next
-  #}
 
   # SS quantity data
   sheet3_servicestats_data <- setNames(data.frame(matrix(ncol = 4,  nrow = 0)), c("Question", "Answer", "Type", "Country")) %>%
