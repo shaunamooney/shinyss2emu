@@ -6,7 +6,6 @@
 #' @param method_continuation_df A table of method continuation rates for long term methods.
 #' @return  A table returning the users for each method each year adjusted for the missing private sector.
 #' @import R2jags
-#' @import readr
 #' @export
 #'
 

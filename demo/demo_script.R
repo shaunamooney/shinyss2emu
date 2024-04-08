@@ -2,6 +2,9 @@
 devtools::load_all()
 new_tool_filepath <- "~/Documents/GitHub/emu_output_analysis/data/SS to EMU Tool - Simple.xlsx"
 
+shiny_input_type <- "Users"
 test_new_tools <- get_tools_info(new_tool_filepath)
 
-test_emu_dataset <- country_ss_to_emu(test_new_tools, shiny_input_type = "Clients")
+test_new_tools <- get_shiny_tools_info(new_tool_filepath, shiny_input_type)
+
+test_emu_dataset <- country_ss_to_emu(test_new_tools, shiny_input_type)

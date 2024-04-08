@@ -7,7 +7,7 @@
 total_adjusted_users(
   adjusted_users_df,
   fixed_adjusted_users_df,
-  incl_condoms,
+  include_condoms_df,
   method_summary
 )
 }
@@ -16,16 +16,13 @@ total_adjusted_users(
 
 \item{fixed_adjusted_users_df}{A CYP table of adjusted contraceptive users for each year for a given service statistic type - calculated using fixed method.}
 
-\item{incl_condoms}{Include condoms in totals or not (TRUE/FALSE)}
-
 \item{method_summary}{Summarise by method or not (TRUE/FALSE)}
+
+\item{incl_condoms}{Include condoms in totals or not (TRUE/FALSE)}
 }
 \value{
 Returns a table of adjusted users that is totalled for LAPM and STM methods.
 }
 \description{
 Total Users
-}
-\examples{
-total_adjusted_users(adj_users_kenya_comm_clients)
 }

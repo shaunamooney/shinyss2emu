@@ -1,12 +1,11 @@
 #' Calculating EMU from excel spreadsheet using modelled supply-share estimates, and saving output in specified files
 #' @name country_ss_to_emu
 #' @param country_tools_info Country tools info (get_tools_info() output)
-#' @param incl_condoms include condoms in EMU output or not
 #' @import tidyverse
 #' @import stringr
 #' @export
 
-country_ss_to_emu <- function(country_tools_info, method_summary = FALSE, shiny_input_type = NULL){
+country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, method_summary = FALSE){
 
   ss_tools_info <- country_tools_info
   country_emu_df <- list()

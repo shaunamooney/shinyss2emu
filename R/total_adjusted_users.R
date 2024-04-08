@@ -5,8 +5,6 @@
 #' @param incl_condoms Include condoms in totals or not (TRUE/FALSE)
 #' @param method_summary Summarise by method or not (TRUE/FALSE)
 #' @return Returns a table of adjusted users that is totalled for LAPM and STM methods.
-#' @examples
-#' total_adjusted_users(adj_users_kenya_comm_clients)
 total_adjusted_users <- function(adjusted_users_df, fixed_adjusted_users_df, include_condoms_df, method_summary) {
 
   # remove condoms users from dataset

@@ -6,14 +6,12 @@
 \usage{
 country_ss_to_emu(
   country_tools_info,
-  incl_condoms = FALSE,
+  shiny_input_type = NULL,
   method_summary = FALSE
 )
 }
 \arguments{
 \item{country_tools_info}{Country tools info (get_tools_info() output)}
-
-\item{incl_condoms}{include condoms in EMU output or not}
 }
 \description{
 Calculating EMU from excel spreadsheet using modelled supply-share estimates, and saving output in specified files

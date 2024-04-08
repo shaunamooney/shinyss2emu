@@ -7,11 +7,11 @@
 adjust_users_uncertainty(
   sectors_reporting_input,
   my_country_set_up,
-  incl_condoms,
   reporting_rates_df,
   baseline_users,
   commodities_table,
-  method_continuation_df
+  method_continuation_df,
+  user_input_adjustment_table
 )
 }
 \arguments{
