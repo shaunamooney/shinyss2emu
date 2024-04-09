@@ -460,8 +460,6 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     tidyr::spread(Type_Year, Answer) %>%
     mutate(CountryName=country_name)
 
-  clients_exist <- service_stats_type_exist %>% filter(!is.na(Clients_FirstYear))
-
 
   clients_rr_data <- setNames(data.frame(matrix(ncol = 4,  nrow = 0)), c("Year", "reporting_rate", "Type", "Country")) %>%
     mutate( Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type=as.character(Type), Country=as.character(Country))
@@ -469,8 +467,13 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   clients_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
-  if(nrow(clients_exist) > 0 & shiny_input_type == "Clients"){
-    test_clients <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Clients) Input"))
+  if(shiny_input_type == "Clients"){
+
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Clients) Input"))
+
+    output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Output")
+    condoms <- output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Clients") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -482,7 +485,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     last_year <- last_year_df[1,2]
 
 
-    clients_rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)clients")) %>%
+    rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)clients")) %>%
       rename(reporting_rate=2) %>%
       mutate(Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type="Clients")  %>%
       mutate(Country=country_name) %>% tidyr::drop_na(reporting_rate)
@@ -491,15 +494,15 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     #Pattern to be matched
     pat_en <- "STEP 2 of 3. ENTER COMMODITIES DATA"
     pat_fr <- "ÉTAPE 2 de 3. SAISIR LES DONNÉES DES PRODUITS"
-    find_test_clients_en <-as.data.frame(as.matrix(str_detect(test_clients, pat_en) )) %>%
+    find_test_en <-as.data.frame(as.matrix(str_detect(test_type, pat_en) )) %>%
       tibble::rowid_to_column()
-    find_test_clients_fr <-as.data.frame(as.matrix(str_detect(test_clients, pat_fr) )) %>%
+    find_test_fr <-as.data.frame(as.matrix(str_detect(test_type, pat_fr) )) %>%
       tibble::rowid_to_column()
-    find_test_clients <- bind_rows(find_test_clients_en, find_test_clients_fr) %>% filter(V1=="TRUE")
+    find_test <- bind_rows(find_test_en, find_test_fr) %>% filter(V1=="TRUE")
 
-    first_cell <- min(find_test_clients$rowid)
-    rows <- nrow(test_clients)
-    cols <- ncol(test_clients)
+    first_cell <- min(find_test$rowid)
+    rows <- nrow(test_type)
+    cols <- ncol(test_type)
 
     col_1 <-  (first_cell %/%  rows ) + 2
     col_last <- col_1 + 4 + (last_year - first_year)
@@ -507,29 +510,29 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_clients <- test_clients[row_1:row_last, col_1:col_last]
-    matrix_clients[1,1] <- "Method"
-    matrix_clients[1,3] <- "CYP"
+    matrix_type <- test_type[row_1:row_last, col_1:col_last]
+    matrix_type[1,1] <- "Method"
+    matrix_type[1,3] <- "CYP"
 
-    clients_inputs_clean <- data.frame(matrix_clients)
-    colnames(clients_inputs_clean) <- clients_inputs_clean[1,]
-    clients_inputs_clean <- clients_inputs_clean[-1, ]
+    type_inputs_clean <- data.frame(matrix_type)
+    colnames(type_inputs_clean) <- type_inputs_clean[1,]
+    type_inputs_clean <- type_inputs_clean[-1, ]
 
-    n_col <- ncol(clients_inputs_clean %>% select(-matches("^NA$")))
+    n_col <- ncol(type_inputs_clean %>% select(-matches("^NA$")))
 
-    clients_inputs_clean <- clients_inputs_clean %>% select(-matches("^NA$")) %>% gather(Year, Commodities, 5:n_col) %>%
+    type_inputs_clean <- type_inputs_clean %>% select(-matches("^NA$")) %>% gather(Year, Commodities, 5:n_col) %>%
       select(-matches("^NA$")) %>%
       filter(!is.na(Method)) %>%
       mutate(Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type="Clients")  %>%
       mutate(Country=country_name)
 
 
-    clients_rr_data <- bind_rows(clients_rr_data, clients_rr_clean)
-    clients_rr_years <- clients_rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    clients_inputs_data <- bind_rows(clients_inputs_data, clients_inputs_clean) #%>% filter(Year %in% clients_rr_years)
-    year_acceptance_location <- which(test_clients == "Year of method acceptance", arr.ind = TRUE) %>%
+    rr_data <- bind_rows(clients_rr_data, rr_clean)
+    rr_years <- rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
+    type_inputs_data <- bind_rows(clients_inputs_data, type_inputs_clean) #%>% filter(Year %in% clients_rr_years)
+    year_acceptance_location <- which(test_type == "Year of method acceptance", arr.ind = TRUE) %>%
       as_tibble()
-    clients_method_continuation <- test_clients[(year_acceptance_location$row + 1):(year_acceptance_location$row + 7), (year_acceptance_location$col-1):(year_acceptance_location$col+16)] %>% as_tibble() %>%
+    type_method_continuation <- test_type[(year_acceptance_location$row + 1):(year_acceptance_location$row + 7), (year_acceptance_location$col-1):(year_acceptance_location$col+16)] %>% as_tibble() %>%
       rename(method_overview = 1, method_detail = 2) %>%
       rename_with(~paste0("Year_", seq_along(.)), .cols = -(1:2)) %>% fill(method_overview) %>% mutate(method_detail = ifelse(grepl("ligat", method_detail, ignore.case = TRUE), "Tubal Ligation (F)",
                                                                                                                               ifelse(grepl("vasect", method_detail, ignore.case = TRUE), "Vasectomy (M)",
@@ -549,18 +552,19 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     }
 
-  facilities_exist <- service_stats_type_exist %>% filter(!is.na(Facilities_FirstYear))
-
-  facilities_rr_data <- setNames(data.frame(matrix(ncol = 4,  nrow = 0)), c("Year", "reporting_rate", "Type", "Country")) %>%
+   facilities_rr_data <- setNames(data.frame(matrix(ncol = 4,  nrow = 0)), c("Year", "reporting_rate", "Type", "Country")) %>%
     mutate( Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type=as.character(Type), Country=as.character(Country))
 
   facilities_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
 
-  if(nrow(facilities_exist) > 0 & shiny_input_type == "Facilities"){
+  if(shiny_input_type == "Facilities"){
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Facility) Input"))
 
-    test_facilities <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Facility) Input"))
+    output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Output")
+    condoms <- output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
 
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Facilities") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
@@ -571,7 +575,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     #Pattern to be matched
 
-    facilities_rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)facilities|établissements")) %>%
+    rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)facilities|établissements")) %>%
       rename(reporting_rate=2) %>%
       mutate(Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type="Facilities")  %>%
       mutate(Country=country_name) %>% tidyr::drop_na(reporting_rate)
@@ -580,15 +584,15 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     #Pattern to be matched
     pat_en <- "STEP 2 of 3. ENTER COMMODITIES DATA"
     pat_fr <- "ÉTAPE 2 of 3. SAISIR LES DONNÉES DES PRODUITS"
-    find_test_facilities_en <-as.data.frame(as.matrix(str_detect(test_facilities, pat_en) )) %>%
+    find_test_en <-as.data.frame(as.matrix(str_detect(test_type, pat_en) )) %>%
       tibble::rowid_to_column()
-    find_test_facilities_fr <-as.data.frame(as.matrix(str_detect(test_facilities, pat_fr) )) %>%
+    find_test_fr <-as.data.frame(as.matrix(str_detect(test_type, pat_fr) )) %>%
       tibble::rowid_to_column()
-    find_test_facilities <- bind_rows(find_test_facilities_en, find_test_facilities_fr) %>% filter(V1=="TRUE")
+    find_test <- bind_rows(find_test_en, find_test_fr) %>% filter(V1=="TRUE")
 
-    first_cell <- min(find_test_facilities$rowid)
-    rows <- nrow(test_facilities)
-    cols <- ncol(test_facilities)
+    first_cell <- min(find_test$rowid)
+    rows <- nrow(test_type)
+    cols <- ncol(test_type)
 
     col_1 <-  (first_cell %/%  rows ) + 2
     col_last <- col_1 + 4 + (last_year - first_year)
@@ -596,49 +600,70 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_facilities <- test_facilities[row_1:row_last, col_1:col_last]
-    matrix_facilities[1,1] <- "Method"
-    matrix_facilities[1,3] <- "CYP"
+    matrix_type <- test_type[row_1:row_last, col_1:col_last]
+    matrix_type[1,1] <- "Method"
+    matrix_type[1,3] <- "CYP"
 
-    facilities_inputs_clean <- data.frame(matrix_facilities)
-    colnames(facilities_inputs_clean) <- facilities_inputs_clean[1,]
-    facilities_inputs_clean <- facilities_inputs_clean[-1, ]
+    type_inputs_clean <- data.frame(matrix_type)
+    colnames(type_inputs_clean) <- type_inputs_clean[1,]
+    type_inputs_clean <- type_inputs_clean[-1, ]
 
-    n_col <- ncol(facilities_inputs_clean)
+    n_col <- ncol(type_inputs_clean)
 
-    facilities_inputs_clean <- facilities_inputs_clean %>% gather(Year, Commodities, 5:n_col) %>%
+    type_inputs_clean <- type_inputs_clean %>% gather(Year, Commodities, 5:n_col) %>%
       filter(!is.na(Method)) %>%
       mutate(Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type="Facilities")  %>%
-      mutate( Country=country_name)
+      mutate(Country=country_name)
 
 
-    facilities_rr_data <- bind_rows(facilities_rr_data, facilities_rr_clean)
-    facilities_rr_years <- facilities_rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    facilities_inputs_data <- bind_rows(facilities_inputs_data, facilities_inputs_clean) #%>% filter(Year %in% facilities_rr_years)
-    #facilities_method_continuation <- test_facilities[21:27, 121:139] %>% as_tibble() %>%
-    #  rename(method_overview = 1, method_detail = 2) %>%
-    #  rename_with(~paste0("Year_", seq_along(.)), .cols = -(1:2)) %>% fill(method_overview)
+    rr_data <- bind_rows(facilities_rr_data, rr_clean)
+    rr_years <- rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
+    type_inputs_data <- bind_rows(facilities_inputs_data, type_inputs_clean) #%>% filter(Year %in% facilities_rr_years)
+    year_acceptance_location <- which(test_type == "Year of method acceptance", arr.ind = TRUE) %>%
+      as_tibble()
+    type_method_continuation <- test_type[(year_acceptance_location$row + 1):(year_acceptance_location$row + 7), (year_acceptance_location$col-1):(year_acceptance_location$col+16)] %>% as_tibble() %>%
+      rename(method_overview = 1, method_detail = 2) %>%
+      rename_with(~paste0("Year_", seq_along(.)), .cols = -(1:2)) %>% fill(method_overview) %>% mutate(method_detail = ifelse(grepl("ligat", method_detail, ignore.case = TRUE), "Tubal Ligation (F)",
+                                                                                                                              ifelse(grepl("vasect", method_detail, ignore.case = TRUE), "Vasectomy (M)",
+                                                                                                                                     ifelse(grepl("copper", method_detail, ignore.case = TRUE), "Copper- T 380-A IUD",
+                                                                                                                                            ifelse(grepl("lng", method_detail, ignore.case = TRUE), "LNG-IUS",
+                                                                                                                                                   ifelse(grepl("implanon", method_detail, ignore.case = TRUE), "Implanon",
+                                                                                                                                                          ifelse(grepl("sino", method_detail, ignore.case = TRUE), "Sino-Implant",
+                                                                                                                                                                 ifelse(grepl("jadelle", method_detail, ignore.case = TRUE), "Jadelle",
+                                                                                                                                                                        ifelse(grepl("4 Year implant", method_detail, ignore.case = TRUE), "Sino-Implant", method_detail)))))))))
+
+
+
+
+
+
+
+
 
   }
 
   # Visits
-  visits_exist <- service_stats_type_exist %>% filter(!is.na(Visits_FirstYear))
-
   visits_rr_data <- setNames(data.frame(matrix(ncol = 4,  nrow = 0)), c("Year", "reporting_rate", "Type", "Country")) %>%
     mutate( Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type=as.character(Type), Country=as.character(Country))
 
   visits_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
-  if(nrow(visits_exist) > 0 & shiny_input_type == "Visits"){
-    test_visits <- as.matrix(read_excel(country_file_path, sheet = "Visits Input"))
+  if(shiny_input_type == "Visits"){
+
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "Visits Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "Visits Input"))
+
+    output_data <- readxl::read_excel(country_file_path, sheet = "Visits Output")
+    condoms <- output_data[99,2] %>% mutate(ss_type = "FP visits")
+
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Visits") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
     last_year_df <- sheet3_servicestats_data %>% filter(Type=="Visits") %>% filter(Question=="Most recent full year of data available:" | Question=="Plus récent complet année de données disponibles:") %>%
       mutate(Answer=as.numeric(Answer))
     first_year <- first_year_df[1,2]
     last_year <- last_year_df[1,2]
-    visits_rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)visits|visites")) %>%
+    rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)visits|visites")) %>%
       rename(reporting_rate=2) %>%
       mutate(Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type="Visits")  %>%
       mutate(Country=country_name) %>% tidyr::drop_na(reporting_rate)
@@ -646,15 +671,15 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     #Pattern to be matched
     pat_en <- "STEP 2 of 3. ENTER VISITS DATA"
     pat_fr <- "ÉTAPE 2 de 3. SAISIR LES DONNÉES DES VISITES"
-    find_test_visits_en <-as.data.frame(as.matrix(str_detect(test_visits, pat_en) )) %>%
+    find_test_en <-as.data.frame(as.matrix(str_detect(test_type, pat_en) )) %>%
       tibble::rowid_to_column()
-    find_test_visits_fr <-as.data.frame(as.matrix(str_detect(test_visits, pat_fr) )) %>%
+    find_test_fr <-as.data.frame(as.matrix(str_detect(test_type, pat_fr) )) %>%
       tibble::rowid_to_column()
-    find_test_visits <- bind_rows(find_test_visits_en, find_test_visits_fr) %>% filter(V1=="TRUE")
+    find_test <- bind_rows(find_test_en, find_test_fr) %>% filter(V1=="TRUE")
 
-    first_cell <- min(find_test_visits$rowid)
-    rows <- nrow(test_visits)
-    cols <- ncol(test_visits)
+    first_cell <- min(find_test$rowid)
+    rows <- nrow(test_type)
+    cols <- ncol(test_type)
 
     col_1 <-  (first_cell %/%  rows ) + 2
     col_last <- col_1 + 4 + (last_year - first_year)
@@ -662,48 +687,73 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_visits <- test_visits[row_1:row_last, col_1:col_last]
-    matrix_visits[1,1] <- "Method"
-    matrix_visits[1,3] <- "CYP"
+    matrix_type<- test_type[row_1:row_last, col_1:col_last]
+    matrix_type[1,1] <- "Method"
+    matrix_type[1,3] <- "CYP"
 
-    visits_inputs_clean <- data.frame(matrix_visits)
-    colnames(visits_inputs_clean) <- visits_inputs_clean[1,]
-    visits_inputs_clean <- visits_inputs_clean[-1, ]
+    type_inputs_clean <- data.frame(matrix_type)
+    colnames(type_inputs_clean) <- type_inputs_clean[1,]
+    type_inputs_clean <- type_inputs_clean[-1, ]
 
-    n_col <- ncol(visits_inputs_clean)
+    n_col <- ncol(type_inputs_clean)
 
-    visits_inputs_clean <- visits_inputs_clean %>% gather(Year, Commodities, 5:n_col) %>%
+    type_inputs_clean <- type_inputs_clean %>% gather(Year, Commodities, 5:n_col) %>%
       filter(!is.na(Method)) %>%
       mutate(Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type="Visits")  %>%
       mutate( Country=country_name)
 
 
-    visits_rr_data <- bind_rows(visits_rr_data, visits_rr_clean)
-    visits_rr_years <- visits_rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    visits_inputs_data <- bind_rows(visits_inputs_data, visits_inputs_clean) #%>% filter(Year %in% visits_rr_years)
-    #visits_method_continuation <- test_visits[21:27, 121:139] %>% as_tibble() %>%
-    #  rename(method_overview = 1, method_detail = 2) %>%
-    #  rename_with(~paste0("Year_", seq_along(.)), .cols = -(1:2)) %>% fill(method_overview)
+    rr_data <- bind_rows(visits_rr_data, rr_clean)
+    rr_years <- rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
+    type_inputs_data <- bind_rows(visits_inputs_data, type_inputs_clean) #%>% filter(Year %in% visits_rr_years)
+
+    year_acceptance_location <- which(test_type == "Year of method acceptance", arr.ind = TRUE) %>%
+      as_tibble()
+    type_method_continuation <- test_type[(year_acceptance_location$row + 1):(year_acceptance_location$row + 7), (year_acceptance_location$col-1):(year_acceptance_location$col+16)] %>% as_tibble() %>%
+      rename(method_overview = 1, method_detail = 2) %>%
+      rename_with(~paste0("Year_", seq_along(.)), .cols = -(1:2)) %>% fill(method_overview) %>% mutate(method_detail = ifelse(grepl("ligat", method_detail, ignore.case = TRUE), "Tubal Ligation (F)",
+                                                                                                                              ifelse(grepl("vasect", method_detail, ignore.case = TRUE), "Vasectomy (M)",
+                                                                                                                                     ifelse(grepl("copper", method_detail, ignore.case = TRUE), "Copper- T 380-A IUD",
+                                                                                                                                            ifelse(grepl("lng", method_detail, ignore.case = TRUE), "LNG-IUS",
+                                                                                                                                                   ifelse(grepl("implanon", method_detail, ignore.case = TRUE), "Implanon",
+                                                                                                                                                          ifelse(grepl("sino", method_detail, ignore.case = TRUE), "Sino-Implant",
+                                                                                                                                                                 ifelse(grepl("jadelle", method_detail, ignore.case = TRUE), "Jadelle",
+                                                                                                                                                                        ifelse(grepl("4 Year implant", method_detail, ignore.case = TRUE), "Sino-Implant", method_detail)))))))))
+
+
+
+
+
+
+
+
+
+
   }
 
   # Users
-  users_exist <- service_stats_type_exist %>% filter(!is.na(Users_FirstYear))
-
   users_rr_data <- setNames(data.frame(matrix(ncol = 4,  nrow = 0)), c("Year", "reporting_rate", "Type", "Country")) %>%
     mutate( Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type=as.character(Type), Country=as.character(Country))
 
   users_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
-  if(nrow(users_exist) > 0 & shiny_input_type == "Users"){
-    test_users <- as.matrix(read_excel(country_file_path, sheet = "Users Input"))
+  if(shiny_input_type == "Users"){
+
+    sheet_data <- readxl::read_excel(country_file_path, sheet = "Users Input")
+    test_type <- as.matrix(read_excel(country_file_path, sheet = "Users Input"))
+
+    output_data <- readxl::read_excel(country_file_path, sheet = "Users Output")
+    condoms <- output_data[99,2] %>% mutate(ss_type = "FP users")
+
+
     first_year_df <- sheet3_servicestats_data %>% filter(Type=="Users") %>% filter(Question=="First year of data available:" | Question=="Première année de données disponible:") %>%
       mutate(Answer=as.numeric(Answer))
     last_year_df <- sheet3_servicestats_data %>% filter(Type=="Users") %>% filter(Question=="Most recent full year of data available:" | Question=="Plus récent complet année de données disponibles:") %>%
       mutate(Answer=as.numeric(Answer))
     first_year <- first_year_df[1,2]
     last_year <- last_year_df[1,2]
-    users_rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)users|Utilisatrices|Utilisateurs")) %>%
+    rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)users|Utilisatrices|Utilisateurs")) %>%
       rename(reporting_rate=2) %>%
       mutate(Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type="Users")  %>%
       mutate(Country=country_name) %>% tidyr::drop_na(reporting_rate)
@@ -712,15 +762,15 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     #Pattern to be matched
     pat_en <- "STEP 2 of 3. ENTER USERS DATA"
     pat_fr <- "ÉTAPE 2 of 3. SAISIR LES DONNÉES DES UTILISATEURS"
-    find_test_users_en <-as.data.frame(as.matrix(str_detect(test_users, pat_en) )) %>%
+    find_test_en <-as.data.frame(as.matrix(str_detect(test_type, pat_en) )) %>%
       tibble::rowid_to_column()
-    find_test_users_fr <-as.data.frame(as.matrix(str_detect(test_users, pat_fr) )) %>%
+    find_test_fr <-as.data.frame(as.matrix(str_detect(test_type, pat_fr) )) %>%
       tibble::rowid_to_column()
-    find_test_users <- bind_rows(find_test_users_en, find_test_users_fr) %>% filter(V1=="TRUE")
+    find_test <- bind_rows(find_test_en, find_test_fr) %>% filter(V1=="TRUE")
 
-    first_cell <- min(find_test_users$rowid)
-    rows <- nrow(test_users)
-    cols <- ncol(test_users)
+    first_cell <- min(find_test$rowid)
+    rows <- nrow(test_type)
+    cols <- ncol(test_type)
 
     col_1 <-  (first_cell %/%  rows ) + 2
     col_last <- col_1 + 4 + (last_year - first_year)
@@ -728,33 +778,33 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     row_1 <- (first_cell %%  rows) + 5
     row_last <-    row_1 + 25
 
-    matrix_users <- test_users[row_1:row_last, col_1:col_last]
-    matrix_users[1,1] <- "Method"
-    matrix_users[1,3] <- "CYP"
+    matrix_type <- test_type[row_1:row_last, col_1:col_last]
+    matrix_type[1,1] <- "Method"
+    matrix_type[1,3] <- "CYP"
 
-    users_inputs_clean <- data.frame(matrix_users)
-    colnames(users_inputs_clean) <- users_inputs_clean[1,]
-    users_inputs_clean <- users_inputs_clean[-1, ]
+    type_inputs_clean <- data.frame(matrix_type)
+    colnames(type_inputs_clean) <- type_inputs_clean[1,]
+    type_inputs_clean <- type_inputs_clean[-1, ]
 
-    n_col <- ncol(users_inputs_clean)
+    n_col <- ncol(type_inputs_clean)
 
-    users_inputs_clean <- users_inputs_clean %>% gather(Year, Commodities, 5:n_col) %>%
+    type_inputs_clean <- type_inputs_clean %>% gather(Year, Commodities, 5:n_col) %>%
       filter(!is.na(Method)) %>%
       mutate(Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type="Users")  %>%
       mutate( Country=country_name)
 
-    users_rr_data <- bind_rows(users_rr_data, users_rr_clean)
-    users_rr_years <- users_rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    users_inputs_data <- bind_rows(users_inputs_data, users_inputs_clean) #%>% filter(Year %in% users_rr_years)
-    #users_method_continuation <- test_users[21:27, 121:139] %>% as_tibble() %>%
-    #  rename(method_overview = 1, method_detail = 2) %>%
-    #  rename_with(~paste0("Year_", seq_along(.)), .cols = -(1:2)) %>% fill(method_overview)
+    rr_data <- bind_rows(users_rr_data, rr_clean)
+    rr_years <- users_rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
+    type_inputs_data <- bind_rows(users_inputs_data, type_inputs_clean) #%>% filter(Year %in% users_rr_years)
+
+    type_method_continuation <- NULL
+
   }
 
 
   # Combining Data
-  rr_clean <- bind_rows(clients_rr_data, facilities_rr_data, visits_rr_data, users_rr_data)
-  inputs_clean <- bind_rows(clients_inputs_data, facilities_inputs_data, visits_inputs_data, users_inputs_data)
+  #rr_clean <- bind_rows(clients_rr_data, facilities_rr_data, visits_rr_data, users_rr_data)
+  inputs_clean <- type_inputs_data
 
   ss_quantity_data <- inputs_clean %>%
     select(Type, Method, Year, Commodities) %>%
@@ -792,87 +842,33 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
                                                                                                                                                          ifelse(grepl("jours", method_detail, ignore.case = TRUE), "SDM (Standard Days)",
                                                                                                                                                                 ifelse(grepl("vaginale", method_detail, ignore.case = TRUE), "Vaginal barrier",
                                                                                                                                                                        ifelse(grepl("CU", method_detail, ignore.case = TRUE), "EC", method_detail))))))))))))))))))))))
-  ss_quantity_data <- ss_quantity_data
+  #ss_quantity_data <- ss_quantity_data
 
-  clients_sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Input")
-  fac_sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Input")
-  users_sheet_data <- readxl::read_excel(country_file_path, sheet = "Users Input")
-  visits_sheet_data <- readxl::read_excel(country_file_path, sheet = "Visits Input")
 
-  clients_cyp_factors_long <- clients_sheet_data[21:28, 2:6] %>%
+
+
+
+
+  cyp_factors_long <- sheet_data[21:28, 2:6] %>%
     as_tibble() %>%
     rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
     fill(method_overview, .direction = "down") %>%
     mutate(method_type = "long",
            cyp_factor = as.numeric(cyp_factor),
-           ss_type = "Contraceptive commodities distributed to clients")
+           ss_type = shiny_input_type)
 
 
-  clients_cyp_factors_short <- clients_sheet_data[30:44, 2:6] %>%
+  cyp_factors_short <- sheet_data[30:44, 2:6] %>%
     as_tibble() %>%
     rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
     fill(method_overview, .direction = "down") %>%
     mutate(method_type = "short",
            cyp_factor = as.numeric(cyp_factor),
-           ss_type = "Contraceptive commodities distributed to clients")
+           ss_type = shiny_input_type)
 
-  fac_cyp_factors_long <- fac_sheet_data[21:28, 2:6] %>%
-    as_tibble() %>%
-    rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
-    fill(method_overview, .direction = "down") %>%
-    mutate(method_type = "long",
-           cyp_factor = as.numeric(cyp_factor),
-           ss_type = "Contraceptive commodities distributed to facilities")
-
-
-  fac_cyp_factors_short <- fac_sheet_data[30:44, 2:6] %>%
-    as_tibble() %>%
-    rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
-    fill(method_overview, .direction = "down") %>%
-    mutate(method_type = "short",
-           cyp_factor = as.numeric(cyp_factor),
-           ss_type = "Contraceptive commodities distributed to facilities")
-
-  visits_cyp_factors_long <- visits_sheet_data[21:28, 2:6] %>%
-    as_tibble() %>%
-    rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
-    fill(method_overview, .direction = "down") %>%
-    mutate(method_type = "long",
-           cyp_factor = as.numeric(cyp_factor),
-           ss_type = "FP visits")
-
-  visits_cyp_factors_short <- visits_sheet_data[30:44, 2:6] %>%
-    as_tibble() %>%
-    rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
-    fill(method_overview, .direction = "down") %>%
-    mutate(method_type = "short",
-           cyp_factor = as.numeric(cyp_factor),
-           ss_type = "FP visits")
-
-  users_cyp_factors_long <- users_sheet_data[21:28, 2:6] %>%
-    as_tibble() %>%
-    rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
-    fill(method_overview, .direction = "down") %>%
-    mutate(method_type = "long",
-           cyp_factor = as.numeric(cyp_factor),
-           ss_type = "FP users")
-
-  users_cyp_factors_short <- users_sheet_data[30:44, 2:6] %>%
-    as_tibble() %>%
-    rename(method_overview = 1, method_detail = 2, cyp_factor = 3, cyp_factor_adjusted = 4, units = 5) %>%
-    fill(method_overview, .direction = "down") %>%
-    mutate(method_type = "short",
-           cyp_factor = as.numeric(cyp_factor),
-           ss_type = "FP users")
-  #browser()
-  cyp_table_all <- rbind(clients_cyp_factors_long,
-                         clients_cyp_factors_short,
-                         fac_cyp_factors_long,
-                         fac_cyp_factors_short,
-                         users_cyp_factors_long,
-                         users_cyp_factors_short,
-                         visits_cyp_factors_long,
-                         visits_cyp_factors_short)  %>%
+   #browser()
+  cyp_table_all <- rbind(cyp_factors_long,
+                         cyp_factors_short)  %>%
     mutate(method_detail = ifelse(grepl("implanon", method_detail, ignore.case = TRUE), "Implanon",
                                   ifelse(grepl("jadelle", method_detail, ignore.case = TRUE), "Jadelle",
                                          ifelse(grepl("LNG-IUS", method_detail, ignore.case = TRUE), "LNG-IUS",
@@ -920,17 +916,12 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
 
 
-  clients_output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Output")
-  fac_output_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Output")
-  users_output_data <- readxl::read_excel(country_file_path, sheet = "Users Output")
-  visits_output_data <- readxl::read_excel(country_file_path, sheet = "Visits Output")
 
-  clients_condoms <- clients_output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to clients")
-  fac_condoms <- fac_output_data[99,2] %>% mutate(ss_type = "Contraceptive commodities distributed to facilities")
-  users_condoms <- users_output_data[99,2] %>% mutate(ss_type = "FP users")
-  visits_condoms <- visits_output_data[99,2] %>% mutate(ss_type = "FP visits")
 
-  condoms_include_df <- rbind(clients_condoms, fac_condoms, users_condoms, visits_condoms) %>% rename(include_exclude_condoms = 1)
+
+
+
+  condoms_include_df <- condoms %>% rename(include_exclude_condoms = 1)
 
   user_input_adjustment_table <- user_input_adjustment_table %>% mutate(method_overview = ifelse(method_overview == "Stérilisation (F)", "Sterilization (F)",
                                                                                                  ifelse(method_overview == "Stérilisation (M)", "Sterilization (M)",
@@ -946,6 +937,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
   condoms_include_df <- condoms_include_df %>% mutate(include_exclude_condoms = ifelse(grepl("exc", ignore.case = TRUE, include_exclude_condoms), "Exclude Condoms", "Include Condoms"))
 
+
   return(list(
     ss_quantity_data = ss_quantity_data,
     pop_dataset = pop_dataset,
@@ -957,8 +949,11 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
                                                                                                            ifelse(ss_type == "Users", "FP users",
                                                                                                                   ifelse(ss_type == "Visits", "FP visits", ss_type))))),
     ss_info = ss_info,
-    cyp_table = cyp_table,
-    method_continuation_data = clients_method_continuation,
+    cyp_table = cyp_table %>% mutate(ss_type = ifelse(ss_type == "Clients", "Contraceptive commodities distributed to clients",
+                                                      ifelse(ss_type == "Facilities", "Contraceptive commodities distributed to facilities",
+                                                             ifelse(ss_type == "Users", "FP users",
+                                                                    ifelse(ss_type == "Visits", "FP visits", ss_type))))),
+    method_continuation_data = type_method_continuation,
     user_input_adjustment_table = user_input_adjustment_table,
     include_condoms_df = condoms_include_df
   ))

@@ -37,8 +37,11 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     ss_info <- ss_tools_info$ss_info %>% filter(ss_type == s)
     cyp_table <- ss_tools_info$cyp_table %>% filter(ss_type == s)
     reporting_rates <- ss_tools_info$reporting_rates_table %>% filter(ss_type == s)
+
+    if(s != "FP users"){
     long_term_rates <- ss_tools_info$method_continuation_data %>%
       mutate_at(vars(-(1:2)), as.numeric)
+    }
 
     user_input_adjustment_table <- ss_tools_info$user_input_adjustment_table
     include_condoms_df <- ss_tools_info$include_condoms_df %>% filter(ss_type == s)
@@ -59,8 +62,14 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
       select(method_type, method_overview, method_detail, cyp_factor, cyp_factor_adjusted, units, everything(), -ss_type) %>%
       select_if(~any(!is.na(.)))
 
-    # Baseline users
-    baseline_users <- baseline_users(ss_data, s, recode_scaleup_table, long_term_rates)
+
+    if(s == "FP users"){
+      baseline_users <- NULL
+    }
+    else {
+      # Baseline users
+      baseline_users <- baseline_users(ss_data, s, recode_scaleup_table, long_term_rates)
+    }
 
     uncertainty_adjust <- adjust_users_uncertainty(recode_sectors_reporting,
                                                    setup_data,
