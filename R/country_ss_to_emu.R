@@ -18,12 +18,12 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
                        "FP users")
   }
 
-  else{
+  else {
 
-    ss_data_types <- ifelse(shiny_input_type == "Clients", "Contraceptive commodities distributed to clients",
-                       ifelse(shiny_input_type == "Facilities", "Contraceptive commodities distributed to facilities",
-                              ifelse(shiny_input_type == "Users", "FP users",
-                                     ifelse(shiny_input_type == "Visits", "FP visits", "Unknown"))))
+    ss_data_types <- ifelse(shiny_input_type == "clients", "Contraceptive commodities distributed to clients",
+                       ifelse(shiny_input_type == "facilities", "Contraceptive commodities distributed to facilities",
+                              ifelse(shiny_input_type == "users", "FP users",
+                                     ifelse(shiny_input_type == "visits", "FP visits", NA))))
 
   }
 

@@ -467,7 +467,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   clients_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
-  if(shiny_input_type == "Clients"){
+  if(shiny_input_type == "clients"){
 
     sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Clients) Input")
     test_type <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Clients) Input"))
@@ -559,7 +559,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
 
-  if(shiny_input_type == "Facilities"){
+  if(shiny_input_type == "facilities"){
     sheet_data <- readxl::read_excel(country_file_path, sheet = "Commodities (Facility) Input")
     test_type <- as.matrix(read_excel(country_file_path, sheet = "Commodities (Facility) Input"))
 
@@ -649,7 +649,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   visits_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
-  if(shiny_input_type == "Visits"){
+  if(shiny_input_type == "visits"){
 
     sheet_data <- readxl::read_excel(country_file_path, sheet = "Visits Input")
     test_type <- as.matrix(read_excel(country_file_path, sheet = "Visits Input"))
@@ -738,7 +738,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   users_inputs_data <- setNames(data.frame(matrix(ncol = 8,  nrow = 0)), c("Method", "CYP FACTOR", "CYP", "UNITS","Year", "Commodities", "Type", "Country")) %>%
     mutate( Method=as.character(Method),"CYP FACTOR"=as.character("CYP FACTOR"), CYP=as.character(CYP),  UNITS=as.character(UNITS), Year=as.numeric(Year), Commodities=as.numeric(Commodities), Type=as.character(Type), Country=as.character(Country))
 
-  if(shiny_input_type == "Users"){
+  if(shiny_input_type == "users"){
 
     sheet_data <- readxl::read_excel(country_file_path, sheet = "Users Input")
     test_type <- as.matrix(read_excel(country_file_path, sheet = "Users Input"))

@@ -2,7 +2,7 @@
 devtools::load_all()
 new_tool_filepath <- "~/Documents/GitHub/emu_output_analysis/data/SS to EMU Tool - Simple.xlsx"
 
-shiny_input_type <- "Users" # this would be an object in the shiny environment - choice from dropdown menu
+shiny_input_type <- "visits" # this would be an object in the shiny environment - choice from dropdown menu
 
 test_new_tools <- get_shiny_tools_info(new_tool_filepath, shiny_input_type)
 
