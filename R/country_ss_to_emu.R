@@ -62,7 +62,6 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
       select(method_type, method_overview, method_detail, cyp_factor, cyp_factor_adjusted, units, everything(), -ss_type) %>%
       select_if(~any(!is.na(.)))
 
-
     if(s == "FP users"){
       baseline_users <- NULL
     }
