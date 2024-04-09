@@ -10,8 +10,8 @@
 #' @export
 calculate_emu_from_users <- function(pop_data, users_data, fixed_users_data, service_stats_type, reporting_rate_data, method_summary){
 
-  # years where reporting rate is over 80%
-  rr_years <- reporting_rate_data %>% filter(reporting_rate >= 0.8) %>% pull(year)
+  # years where reporting rate is over 60%
+  rr_years <- reporting_rate_data %>% filter(reporting_rate >= 0.6) %>% pull(year)
 
   # emu years
   years_included <- users_data %>% pull(year) %>% unique()

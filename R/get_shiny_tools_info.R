@@ -529,7 +529,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     rr_data <- bind_rows(clients_rr_data, rr_clean)
     rr_years <- rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    type_inputs_data <- bind_rows(clients_inputs_data, type_inputs_clean) #%>% filter(Year %in% clients_rr_years)
+    type_inputs_data <- bind_rows(clients_inputs_data, type_inputs_clean) #%>% filter(Year %in% rr_years)
     year_acceptance_location <- which(test_type == "Year of method acceptance", arr.ind = TRUE) %>%
       as_tibble()
     type_method_continuation <- test_type[(year_acceptance_location$row + 1):(year_acceptance_location$row + 7), (year_acceptance_location$col-1):(year_acceptance_location$col+16)] %>% as_tibble() %>%
@@ -618,7 +618,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     rr_data <- bind_rows(facilities_rr_data, rr_clean)
     rr_years <- rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    type_inputs_data <- bind_rows(facilities_inputs_data, type_inputs_clean) #%>% filter(Year %in% facilities_rr_years)
+    type_inputs_data <- bind_rows(facilities_inputs_data, type_inputs_clean) #%>% filter(Year %in% rr_years)
     year_acceptance_location <- which(test_type == "Year of method acceptance", arr.ind = TRUE) %>%
       as_tibble()
     type_method_continuation <- test_type[(year_acceptance_location$row + 1):(year_acceptance_location$row + 7), (year_acceptance_location$col-1):(year_acceptance_location$col+16)] %>% as_tibble() %>%
@@ -705,7 +705,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     rr_data <- bind_rows(visits_rr_data, rr_clean)
     rr_years <- rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    type_inputs_data <- bind_rows(visits_inputs_data, type_inputs_clean) #%>% filter(Year %in% visits_rr_years)
+    type_inputs_data <- bind_rows(visits_inputs_data, type_inputs_clean) #%>% filter(Year %in% rr_years)
 
     year_acceptance_location <- which(test_type == "Year of method acceptance", arr.ind = TRUE) %>%
       as_tibble()
@@ -795,7 +795,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     rr_data <- bind_rows(users_rr_data, rr_clean)
     rr_years <- users_rr_data %>% filter(reporting_rate >= 0.8) %>% pull(Year)
-    type_inputs_data <- bind_rows(users_inputs_data, type_inputs_clean) #%>% filter(Year %in% users_rr_years)
+    type_inputs_data <- bind_rows(users_inputs_data, type_inputs_clean) #%>% filter(Year %in% rr_years)
 
     type_method_continuation <- NULL
 
