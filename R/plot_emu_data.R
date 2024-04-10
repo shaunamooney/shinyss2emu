@@ -9,6 +9,15 @@ plot_emu_data <- function(emu_data){
 
   country_name <- emu_data %>% pull(name) %>% unique()
   data_type <- emu_data %>% pull(ss_type) %>% unique()
+  region_name <- emu_data %>% pull(Region) %>% unique()
+
+
+  if(is.na(region_name)){
+    plot_title <- paste0(country_name, " (", data_type, ")")
+  }
+  else{
+    plot_title <- paste0(region_name, " (", data_type, ")")
+  }
 
   # plotting EMU data
   emu_plot <- ggplot() +
@@ -24,7 +33,7 @@ plot_emu_data <- function(emu_data){
     theme_bw() + labs(x = "Year", colour = "Data type", y = Delta~"EMU", linetype = " ", shape = " ")  + ggtitle("Annual changes in EMU over time")+ theme(legend.position = "bottom")+ guides(colour = "none")
 
   # combining plots horizontally
-  combined_plots <- emu_plot + delta_emu_plot + plot_annotation(title = paste0(country_name, " (", data_type, ")"))
+  combined_plots <- emu_plot + delta_emu_plot + plot_annotation(title = plot_title)
 
 
 }
