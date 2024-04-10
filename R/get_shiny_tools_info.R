@@ -69,6 +69,10 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   country_name <- set_up_table$Country
   language <- set_up_table$language
 
+  if(set_up_table$National_or_Subnational == "Subnational"){
+    set_up_table$Region <- country_sheet_data[7,7] %>% as.character()
+  }
+
   # Service stats tab scaling step
   ss_setup_sheet_data <- readxl::read_excel(country_file_path, sheet = ss_setup_sheet) %>% as.matrix()
   test_sheet3 <- ss_setup_sheet_data

@@ -128,5 +128,13 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
               sd_emu_roc = sd(delta_emu, na.rm = TRUE)) %>%
     arrange(ss_type) %>% rename(emu = median_emu) %>% filter(emu <= 1)
 
+
+  if ("Region" %in% colnames(setup_data)) {
+    region_name <- ss_tools_info$Region
+
+    overall_emu <- overall_emu %>% mutate(Region = region_name)
+  }
+
+
   return(overall_emu)
 }
