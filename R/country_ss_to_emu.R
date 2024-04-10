@@ -134,6 +134,9 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
 
     overall_emu <- overall_emu %>% mutate(Region = region_name)
   }
+  else{
+    overall_emu <- overall_emu %>% mutate(Region = NA)
+  }
 
 
   return(overall_emu)
