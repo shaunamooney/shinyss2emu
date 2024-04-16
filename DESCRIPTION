@@ -1,10 +1,10 @@
 Package: shinyss2emu
-Title: What the Package Does (One Line, Title Case)
+Title: This package calculates Estimated Modern Use with uncertainty using service statistics data as input.
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+    person("Shauna", "Mooney", , "shauna.mooney.2015@mumail.ie", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: This package calculates Estimated Modern Use, a family planning indicator, with uncertainty using family planning service statistics data as input.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

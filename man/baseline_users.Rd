@@ -14,15 +14,11 @@ baseline_users(
 \arguments{
 \item{commodities_table}{A table of commodities for your chosen service statistic type}
 
-\item{service_stats_type}{What kind of service statistic are you interested in. Possible options are:
-"Contraceptive commodities distributed to clients"
-"Contraceptive commodities distributed to facilities"
-"FP visits"
-"FP users"}
+\item{service_stats_type}{The type of service statistics chosen.}
 
-\item{scale_up_table}{Recoded table using scale up actions of service statistics}
+\item{scale_up_table}{Recoded table using scale up actions of service statistics.}
 
-\item{method_contination_rates}{Method continutaion rates for long term methods}
+\item{method_contination_rates}{Method continutaion rates for long term methods.}
 }
 \value{
 A table calculating the baseline users for the years prior to those included in the data.

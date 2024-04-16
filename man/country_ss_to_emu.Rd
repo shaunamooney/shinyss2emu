@@ -12,6 +12,10 @@ country_ss_to_emu(
 }
 \arguments{
 \item{country_tools_info}{Country tools info (get_tools_info() output)}
+
+\item{shiny_input_type}{The chosen service type (in the Shiny UI)}
+
+\item{method_summary}{Summarise by method or not (TRUE/FALSE)}
 }
 \description{
 Calculating EMU from excel spreadsheet using modelled supply-share estimates, and saving output in specified files

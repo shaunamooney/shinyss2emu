@@ -2,7 +2,7 @@
 % Please edit documentation in R/adjust_users_uncertainty.R
 \name{adjust_users_uncertainty}
 \alias{adjust_users_uncertainty}
-\title{Adjusting quantity data to reflect users with uncertainty}
+\title{Adjusting quantity data to reflect users with uncertainty.}
 \usage{
 adjust_users_uncertainty(
   sectors_reporting_input,
@@ -15,6 +15,10 @@ adjust_users_uncertainty(
 )
 }
 \arguments{
+\item{sectors_reporting_input}{A table of values indicating if a sector is fully/partial/non-reporting.}
+
+\item{my_country_set_up}{A table of primary country information.}
+
 \item{reporting_rates_df}{A table of reporting rates for your chosen ss_type}
 
 \item{baseline_users}{A table of baseline users calculated for the years prior to your chosen ss_type data.}
@@ -22,10 +26,12 @@ adjust_users_uncertainty(
 \item{commodities_table}{A table of commodities for your chosen service statistic type}
 
 \item{method_continuation_df}{A table of method continuation rates for long term methods.}
+
+\item{user_input_adjustment_table}{A table indicating whether a method should be adjusted or not.}
 }
 \value{
-A table returning the users for each method each year adjusted for the missing private sector.
+A table returning the samples of users for each method each year adjusted for the missing private sector.
 }
 \description{
-Adjusting quantity data to reflect users with uncertainty
+Adjusting quantity data to reflect users with uncertainty.
 }
