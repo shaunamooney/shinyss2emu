@@ -1,6 +1,8 @@
 #' Calculating EMU from excel spreadsheet using modelled supply-share estimates, and saving output in specified files
 #' @name country_ss_to_emu
 #' @param country_tools_info Country tools info (get_tools_info() output)
+#' @param shiny_input_type The chosen service type (in the Shiny UI)
+#' @param method_summary Summarise by method or not (TRUE/FALSE)
 #' @import tidyverse
 #' @import stringr
 #' @export

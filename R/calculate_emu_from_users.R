@@ -1,9 +1,9 @@
 #' Calculating EMU incl. and excl. condoms using population data and adjusted users
 #' @name calculate_emu_from_users
 #' @param pop_data A table of population data
-#' @param service_stats_type service statistics type
 #' @param users_data A table of adjusted users totalled for the LAPM and STM methods - calculated using samples.
 #' @param fixed_users_data A table of adjusted users totalled for the LAPM and STM methods - calculated using standard fixed method.
+#' @param service_stats_type service statistics type
 #' @param reporting_rate_data A dataframe of reporting rates by year
 #' @param method_summary Summarise by method or not (TRUE/FALSE)
 #' @return A table of calculated EMU data

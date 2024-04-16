@@ -1,13 +1,9 @@
 #' Calculating the Baseline Users
 #' @name baseline_users
 #' @param commodities_table A table of commodities for your chosen service statistic type
-#' @param service_stats_type What kind of service statistic are you interested in. Possible options are:
-#' "Contraceptive commodities distributed to clients"
-#' "Contraceptive commodities distributed to facilities"
-#' "FP visits"
-#' "FP users"
-#' @param scale_up_table Recoded table using scale up actions of service statistics
-#' @param method_contination_rates Method continutaion rates for long term methods
+#' @param service_stats_type The type of service statistics chosen.
+#' @param scale_up_table Recoded table using scale up actions of service statistics.
+#' @param method_contination_rates Method continutaion rates for long term methods.
 #' @return  A table calculating the baseline users for the years prior to those included in the data.
 baseline_users <- function(commodities_table, service_stats_type, scale_up_table, method_contination_rates) {
 

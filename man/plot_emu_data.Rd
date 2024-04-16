@@ -4,10 +4,12 @@
 \alias{plot_emu_data}
 \title{Plotting EMU data at the level and rate of change.}
 \usage{
-plot_emu_data(emu_data)
+plot_emu_data(emu_data, mcpr_data)
 }
 \arguments{
 \item{emu_data}{A table of EMU data for one chosen type}
+
+\item{mcpr_data}{A table of mCPR run data}
 }
 \value{
 A plot of EMU data

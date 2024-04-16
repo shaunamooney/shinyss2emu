@@ -1,10 +1,13 @@
-#' Adjusting quantity data to reflect users with uncertainty
+#' Adjusting quantity data to reflect users with uncertainty.
 #' @name adjust_users_uncertainty
+#' @param sectors_reporting_input A table of values indicating if a sector is fully/partial/non-reporting.
+#' @param my_country_set_up A table of primary country information.
 #' @param reporting_rates_df A table of reporting rates for your chosen ss_type
 #' @param baseline_users A table of baseline users calculated for the years prior to your chosen ss_type data.
 #' @param commodities_table A table of commodities for your chosen service statistic type
 #' @param method_continuation_df A table of method continuation rates for long term methods.
-#' @return  A table returning the users for each method each year adjusted for the missing private sector.
+#' @param user_input_adjustment_table A table indicating whether a method should be adjusted or not.
+#' @return  A table returning the samples of users for each method each year adjusted for the missing private sector.
 #' @import R2jags
 #' @export
 #'
