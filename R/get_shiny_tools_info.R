@@ -13,6 +13,7 @@
 
 get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
+
   # Pop_Prev tab
   # Read the sheet names from the Excel file
   sheet_names <- readxl::excel_sheets(country_file_path)
@@ -27,6 +28,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   country_sheet_data <- readxl::read_excel(country_file_path, sheet = country_sheet)
   important_info_column <- country_sheet_data %>% tidyr::drop_na(...3) %>% dplyr::pull(...3)
   df <- data.frame(important_info_column)
+
 
   # Filter out numbers greater than zero using dplyr
   years_info <- df %>%
@@ -55,6 +57,19 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     pop_dataset$population <- pop_data
     pop_dataset <- pop_dataset %>%
       tidyr::drop_na(year) %>% dplyr::select(year, population) %>% dplyr::mutate(population = as.numeric(unlist(population))) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
+
+    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...11) %>% dplyr::pull(...11) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+
+    if(set_up_table$AW_or_MW == "AW")
+    {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_aw) %>%
+        mutate(year = 2005 + row_number() - 1)
+    }
+    else {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_mw) %>%
+        mutate(year = 2005 + row_number() - 1)
+    }
   } else if (set_up_table$language == "Francais") {
     pop_sheet_data <- readxl::read_excel(country_file_path, sheet = pop_sheet)
     pop_col_index <- which(colnames(pop_sheet_data) == "Configuration : Entrez les Données Générales") + 1
@@ -65,6 +80,19 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
       tidyr::drop_na(year) %>%
       dplyr::select(year, population) %>%
       dplyr::mutate(population = as.numeric(unlist(population))) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
+
+    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...11) %>% dplyr::pull(...11) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+
+    if(set_up_table$AW_or_MW == "AW")
+    {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_aw) %>%
+        mutate(year = 2005 + row_number() - 1)
+    }
+    else {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_mw) %>%
+        mutate(year = 2005 + row_number() - 1)
+    }
   }
   country_name <- set_up_table$Country
   language <- set_up_table$language
@@ -122,6 +150,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   sheet3_clean.scale <- sheet3_clean.scale %>% dplyr::mutate(method_overview = ifelse(method_detail %in% ster_methods, "Sterilization",
                                                                                ifelse(method_detail %in% iud_methods, "IUD",
                                                                                       ifelse(method_detail %in% implant_methods, "Implant", NA))))
+
 
   recode_scaleup_table <- sheet3_clean.scale  %>%
     tidyr::pivot_longer(cols = c(Clients, Facilities, Visits),
@@ -959,6 +988,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
                                                                     ifelse(ss_type == "visits", "FP visits", ss_type))))),
     method_continuation_data = type_method_continuation,
     user_input_adjustment_table = user_input_adjustment_table,
-    include_condoms_df = condoms_include_df
+    include_condoms_df = condoms_include_df,
+    fpet_mcpr_data = fpet_mcpr_data
   ))
 }

@@ -86,7 +86,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   FP_source_data_long <- FP_source_data_long %>% mutate(sector_category = ifelse(sector == "Public Medical Sector", "public",
                                                                                  ifelse(sector %in% c("NGO", "Private Hospital/ Clinic Delivery", "Pharmacy"), "private", "other"))) %>% mutate(name = Country)
   supply_share_sd <- supply_share_sd %>%
-    mutate(year = ceiling(average_year)) %>%
+    mutate(year = floor(average_year)) %>%
     filter(name == country_name) %>%
     filter(year %in% emu_years) %>%
     mutate(method_overview = ifelse(method_overview == "Implants", "Implant",

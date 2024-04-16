@@ -94,6 +94,7 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
 
     ss_type_number <- match(s, ss_data_types)
 
+
     if(Country == "DR Congo"){
       country_name <- "Democratic Republic of the Congo"
     }
@@ -138,6 +139,12 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     overall_emu <- overall_emu %>% mutate(Region = NA)
   }
 
+  overall_emu <- overall_emu %>%
+    mutate(emu = signif(emu,4),
+           emu_roc = signif(emu_roc, 4),
+           sd_emu = signif(sd_emu, 4),
+           sd_emu_roc = signif(sd_emu_roc, 4)
+          )
 
   return(overall_emu)
 }
