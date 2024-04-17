@@ -97,6 +97,7 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     ss_type_number <- match(s, ss_data_types)
 
 
+    browser()
     if(Country == "DR Congo"){
       country_name <- "Democratic Republic of the Congo"
     }
@@ -104,7 +105,10 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     else if(Country == "Tanzania"){
       country_name <- "United Republic of Tanzania"
     }
-    else{
+    else if(Country == "Cote d'Ivoire"){
+      country_name <- "Côte d'Ivoire"
+    }
+    else {
       country_name <- Country
     }
 
