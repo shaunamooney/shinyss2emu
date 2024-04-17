@@ -133,19 +133,18 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
 
 
   if ("Region" %in% colnames(setup_data)){
-    region_name <- ss_tools_info$Region
-
-    overall_emu <- overall_emu %>% mutate(Region = region_name)
+    region_name <- setup_data$Region
   }
-  else{
-    overall_emu <- overall_emu %>% mutate(Region = NA)
+  else {
+    region_name <- NA
   }
 
   overall_emu <- overall_emu %>%
     mutate(emu = signif(emu,4),
            emu_roc = signif(emu_roc, 4),
            sd_emu = signif(sd_emu, 4),
-           sd_emu_roc = signif(sd_emu_roc, 4)
+           sd_emu_roc = signif(sd_emu_roc, 4),
+           Region = region_name
           )
 
   return(overall_emu)

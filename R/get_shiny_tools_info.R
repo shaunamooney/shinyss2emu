@@ -97,8 +97,8 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   country_name <- set_up_table$Country
   language <- set_up_table$language
 
-  if(set_up_table$National_or_Subnational == "Subnational"){
-    set_up_table$Region <- country_sheet_data[7,7] %>% as.character()
+  if(setup_data$National_or_Subnational != "National"){
+    setup_data <- setup_data %>% mutate(Region = country_sheet_data[7,7] %>% as.character())
   }
 
   # Service stats tab scaling step

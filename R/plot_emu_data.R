@@ -49,6 +49,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
     emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu)) +
       geom_line(mcpr_plot_data, mapping = aes(year, mcpr, linetype = "FPET2 mCPR"), colour = "blue") +
+      geom_point(mcpr_plot_data, mapping = aes(year, mcpr), colour = "blue") +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu - sd_emu, ymax = emu + sd_emu)) +
       theme_bw() +
       labs(x = "Year", y = "EMU", colour = "Data type", linetype = " ") + ggtitle("EMU over time") + theme(legend.position = "bottom")
@@ -58,6 +59,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
       geom_point(emu_data, mapping = aes(year, emu_roc)) +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc)) +
       geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "annual change in mCPR"), colour = "blue") +
+      geom_point(mcpr_plot_data, mapping = aes(year, mcpr_roc), colour = "blue") +
       theme_bw() + labs(x = "Year", colour = "Data type", y = Delta~"EMU", linetype = " ", shape = " ")  + ggtitle("Annual changes in EMU over time")+ theme(legend.position = "bottom")+ guides(colour = "none")
   }
   # combining plots horizontally
