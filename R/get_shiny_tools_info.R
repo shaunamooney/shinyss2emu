@@ -7,6 +7,7 @@
 #' @import tidyverse
 #' @import dplyr
 #' @import readxl
+#' @import readr
 #' @import tidyr
 #' @export
 
