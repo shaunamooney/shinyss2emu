@@ -16,7 +16,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
 
   emu_years <- emu_data %>% pull(year)
 
-  if(is.na(region_name)){
+  if(length(region_name) == 0 | is.na(region_name)){
     plot_title <- paste0(country_name, " (", data_type, ")")
   }
   else{
@@ -48,7 +48,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
     # plotting EMU data
     emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu)) +
-      geom_line(mcpr_plot_data, mapping = aes(year, mcpr, linetype = "FPET2 mCPR")) +
+      geom_line(mcpr_plot_data, mapping = aes(year, mcpr, linetype = "FPET2 mCPR"), colour = "blue") +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu - sd_emu, ymax = emu + sd_emu)) +
       theme_bw() +
       labs(x = "Year", y = "EMU", colour = "Data type", linetype = " ") + ggtitle("EMU over time") + theme(legend.position = "bottom")
@@ -57,7 +57,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
     delta_emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu_roc)) +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc)) +
-      geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "annual change in mCPR")) +
+      geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "annual change in mCPR"), colour = "blue") +
       theme_bw() + labs(x = "Year", colour = "Data type", y = Delta~"EMU", linetype = " ", shape = " ")  + ggtitle("Annual changes in EMU over time")+ theme(legend.position = "bottom")+ guides(colour = "none")
   }
   # combining plots horizontally
