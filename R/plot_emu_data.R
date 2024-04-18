@@ -43,7 +43,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
   }
 
   else {
-    mcpr_plot_data <- mcpr_data %>% mutate(mcpr_roc = mcpr - lag(mcpr)) %>% filter(year %in% emu_years)
+    mcpr_plot_data <- mcpr_data %>% filter(year %in% emu_years) %>% mutate(mcpr_roc = mcpr - lag(mcpr))
 
     # plotting EMU data
     emu_plot <- ggplot() +
