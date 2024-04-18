@@ -518,7 +518,6 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
 
     last_year <- last_year_df[1,2]
 
-
     rr_clean <- reporting_rate_dataset %>% select(Year, matches("(?i)clients")) %>%
       rename(reporting_rate=2) %>%
       mutate(Year=as.numeric(Year), reporting_rate=as.numeric(reporting_rate), Type="Clients")  %>%

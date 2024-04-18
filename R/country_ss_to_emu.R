@@ -106,6 +106,9 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     else if(Country == "Cote d'Ivoire"){
       country_name <- "Côte d'Ivoire"
     }
+    else if(Country == "Lao PDR"){
+      country_name <- "Lao People's Democratic Republic"
+    }
     else {
       country_name <- Country
     }
@@ -115,6 +118,8 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     if(length(country_code) == 0){
       country_code <- NA
     }
+
+
     country_emu_df[[ss_type_number]] <- emu_data$emu_samps %>% mutate(division_numeric_code = country_code)
     fixed_country_emu_df[[ss_type_number]] <- emu_data$fixed_emu %>% mutate(division_numeric_code = country_code)
 

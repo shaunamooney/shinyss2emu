@@ -99,7 +99,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
                                                          ifelse(method_overview == "Female Sterilization", "Sterilization (F)", method_overview))))))
 
 
-
+  if(nrow(supply_share_sd) > 0) {
 
   model_input <- left_join(FP_source_data_temp, supply_share_sd %>% mutate(method_overview = as.character(method_overview)))
 
@@ -257,7 +257,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
                           ungroup()
 
 
-
+}
 
   if(s == "FP users"){
     users_table_overview_fixed <- commodities_table %>%
@@ -341,47 +341,59 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
  users_table_overview_fixed <- users_table_overview_fixed %>%
    mutate(method_overview = ifelse(method_detail == "Vasectomy (M)", "Male Sterilization", method_overview))
 
-  inverse_adjustment_table <- adj_factor_table %>%
-   #mutate(adj_factor = ifelse(adj_factor > 1, 1, ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor)))) %>%
-   #mutate(adj_factor = ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor))) %>% # COME BACK TO THIS
-    mutate(inv_adj_factor = 1/adj_factor)
+  if(nrow(supply_share_sd) == 0){
+    users_inc_private_sector_df <- users_table_overview_fixed %>%
+      mutate(total_users = current_users*1) %>% filter(total_users > 0) %>% mutate(sample_id = 1)
 
-  users_adj_df <- full_join(inverse_adjustment_table, users_table_overview_fixed)
+    users_inc_private_sector_df_fixed <- users_inc_private_sector_df %>% select(-sample_id)
 
-  users_adj_df <- users_adj_df %>%
-    drop_na(count)
+    inverse_adjustment_table <- NULL
 
-  users_adj_df_no_inv_adj <- users_adj_df %>% filter(is.na(inv_adj_factor)) %>% select(-sample_id)
-  n_now_na_inv_adj <- nrow(users_adj_df_no_inv_adj)
-  if(n_now_na_inv_adj > 0){
-    users_adj_df_no_inv_adj <- users_adj_df_no_inv_adj %>%
-      slice(rep(1:n(), each = n_samples)) %>%
-      mutate(sample_id = rep(1:n_samples, times = n_now_na_inv_adj)) %>% mutate(inv_adj_factor = 1)
 
-    users_adj_df <- rbind(users_adj_df, users_adj_df_no_inv_adj)
   }
 
-  users_adj_df_fixed <- users_table_overview_fixed %>%
-    left_join(fixed_inverse_adjustment_table)
+  else {
+    inverse_adjustment_table <- adj_factor_table %>%
+     #mutate(adj_factor = ifelse(adj_factor > 1, 1, ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor)))) %>%
+     #mutate(adj_factor = ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor))) %>% # COME BACK TO THIS
+      mutate(inv_adj_factor = 1/adj_factor)
 
-  users_adj_df_fixed <- users_adj_df_fixed %>%
-    drop_na(count)
+    users_adj_df <- full_join(inverse_adjustment_table, users_table_overview_fixed)
 
-  user_input_no_adjustment_methods <- user_input_adjustment_table %>% filter(include_adjustment == "No") %>% pull(method_overview)
+    users_adj_df <- users_adj_df %>%
+      drop_na(count)
 
-  if(length(user_input_no_adjustment_methods) > 0 ){
-    users_adj_df <- users_adj_df %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
-    users_adj_df_fixed <- users_adj_df_fixed %>% mutate(fixed_inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, fixed_inv_adj_factor))
+    users_adj_df_no_inv_adj <- users_adj_df %>% filter(is.na(inv_adj_factor)) %>% select(-sample_id)
+    n_now_na_inv_adj <- nrow(users_adj_df_no_inv_adj)
+    if(n_now_na_inv_adj > 0){
+      users_adj_df_no_inv_adj <- users_adj_df_no_inv_adj %>%
+        slice(rep(1:n(), each = n_samples)) %>%
+        mutate(sample_id = rep(1:n_samples, times = n_now_na_inv_adj)) %>% mutate(inv_adj_factor = 1)
+
+      users_adj_df <- rbind(users_adj_df, users_adj_df_no_inv_adj)
+    }
+
+    users_adj_df_fixed <- users_table_overview_fixed %>%
+      left_join(fixed_inverse_adjustment_table)
+
+    users_adj_df_fixed <- users_adj_df_fixed %>%
+      drop_na(count)
+
+    user_input_no_adjustment_methods <- user_input_adjustment_table %>% filter(include_adjustment == "No") %>% pull(method_overview)
+
+    if(length(user_input_no_adjustment_methods) > 0 ){
+      users_adj_df <- users_adj_df %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
+      users_adj_df_fixed <- users_adj_df_fixed %>% mutate(fixed_inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, fixed_inv_adj_factor))
+    }
+
+    users_inc_private_sector_df <- users_adj_df %>%
+      mutate(inv_adj_factor = ifelse(is.na(inv_adj_factor), 1, inv_adj_factor)) %>%
+      mutate(total_users = current_users*inv_adj_factor) %>% filter(total_users > 0)
+
+    users_inc_private_sector_df_fixed <- users_adj_df_fixed %>%
+      mutate(fixed_inv_adj_factor = ifelse(is.na(fixed_inv_adj_factor), 1, fixed_inv_adj_factor)) %>%
+      mutate(total_users = current_users*fixed_inv_adj_factor) %>% filter(total_users > 0)
   }
-
-  users_inc_private_sector_df <- users_adj_df %>%
-    mutate(inv_adj_factor = ifelse(is.na(inv_adj_factor), 1, inv_adj_factor)) %>%
-    mutate(total_users = current_users*inv_adj_factor) %>% filter(total_users > 0)
-
-  users_inc_private_sector_df_fixed <- users_adj_df_fixed %>%
-    mutate(fixed_inv_adj_factor = ifelse(is.na(fixed_inv_adj_factor), 1, fixed_inv_adj_factor)) %>%
-    mutate(total_users = current_users*fixed_inv_adj_factor) %>% filter(total_users > 0)
-
   # ----------------------------------------------------------------------------
   return(list(users_incl_private = users_inc_private_sector_df,
               user_incl_private_fixed = users_inc_private_sector_df_fixed,
