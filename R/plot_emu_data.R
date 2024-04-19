@@ -38,7 +38,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
       geom_point(emu_data, mapping = aes(year, emu_roc)) +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc)) +
       #geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "annual change in mCPR")) +
-      theme_bw() + labs(x = "Year", colour = "Data type", y = Delta~"EMU", linetype = " ", shape = " ", caption = "Right visual shows rates of change in EMU with uncertainty (shown using standard deviation error bars).\n Rate of change refers to the annual difference between observations. \nFor example, the EMU rate of change in 2020 is the difference between the 2020 EMU and 2019 EMU.")  + ggtitle("Annual changes in EMU over time") + theme(legend.position = "top")
+      theme_bw() + labs(x = "Year", colour = "Data type", y = Delta~"EMU", linetype = " ", shape = " ", caption = "Right visual shows rates of change in EMU with uncertainty (shown using standard deviation error bars).\n Rate of change refers to the annual difference between observations. \nFor example, the EMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU.")  + ggtitle("Annual changes in EMU over time") + theme(legend.position = "top")
 
   }
 
@@ -61,7 +61,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc, colour = "Rates of change in EMU \n(with standard deviation bars)"), width = 0.5) +
       geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "Rates of change in mCPR (FPET2)", colour = "Rates of change in mCPR (FPET2)")) +
       geom_point(mcpr_plot_data, mapping = aes(year, mcpr_roc, colour = "Rates of change in mCPR (FPET2)")) +
-      theme_bw() + labs(x = "Year", colour = " ", y = Delta~"EMU", linetype = " ", shape = " ", caption = "Right visual shows rates of change in EMU with uncertainty and rates of change in FPET2 mCPR\nover time. Rate of change refers to the annual difference between observations. For example, the\nEMU rate of change in 2020 is the difference between the 2020 EMU and 2019 EMU.")  +
+      theme_bw() + labs(x = "Year", colour = " ", y = Delta~"EMU", linetype = " ", shape = " ", caption = "Right visual shows rates of change in EMU with uncertainty and rates of change in FPET2 mCPR\nover time. Rate of change refers to the annual difference between observations. For example, the\nEMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU.")  +
       ggtitle("Rates of change in EMU and mCPR over time") +
       theme(legend.position = "top") +
       guides(linetype = "none")
