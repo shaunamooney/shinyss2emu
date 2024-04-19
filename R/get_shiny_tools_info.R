@@ -22,7 +22,14 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   # Define initial sheet names of interest
   country_sheet <- "1. Country_Language Set Up"
   pop_sheet <- "2. Pop_Prev Set Up"
-  emu_output_sheet <- "\"EMU\" Output"
+
+  if ("EMU Output" %in% sheet_names){
+    emu_output_sheet <- "EMU Output"
+  }
+  else{
+    emu_output_sheet <- "\"EMU\" Output"
+  }
+
   ss_setup_sheet <- "3. ServiceStats Set Up"
 
   # Read data from "1. Country_Language Set Up" sheet
