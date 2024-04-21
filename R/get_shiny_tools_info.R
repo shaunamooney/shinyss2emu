@@ -978,6 +978,7 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
   condoms_include_df <- condoms_include_df %>% mutate(include_exclude_condoms = ifelse(grepl("exc", ignore.case = TRUE, include_exclude_condoms), "Exclude Condoms", "Include Condoms"))
 
 
+  fpet_mcpr_data <- fpet_mcpr_data %>% mutate(country_language = setup_data$language)
   return(list(
     ss_quantity_data = ss_quantity_data,
     pop_dataset = pop_dataset,

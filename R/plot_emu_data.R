@@ -8,6 +8,7 @@
 #' @export
 plot_emu_data <- function(emu_data, mcpr_data){
 
+  language <- mcpr_data %>% pull(country_language) %>% unique()
   mcpr_data <- mcpr_data %>% filter(mcpr > 0)
 
   country_name <- emu_data %>% pull(name) %>% unique()
@@ -25,24 +26,44 @@ plot_emu_data <- function(emu_data, mcpr_data){
 
 
   if(nrow(mcpr_data) == 0){
+
+    if(language == "English"){
+      emu_plot_caption <- "Left visual shows EMU with uncertainty (shown using standard deviation error bars). \n The uncertainty associated with EMU is due to the uncertainty \nassociated with the private sector adjustment factor in the SS-to-EMU calculation process."
+      delta_plot_caption <-"Right visual shows rates of change in EMU with uncertainty (shown using standard deviation error bars).\n Rate of change refers to the annual difference between observations. \nFor example, the EMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU."
+    }
+    else {
+      emu_plot_caption <- "Le visuel de gauche montre l'EMU avec incertitude au fil du temps.  L’incertitude liée à l’UEM est due à l’incertitude associée à l’ajustement du secteur privé dans le processus de calcul d'outil SS to EMU."
+      delta_plot_caption <- "Le visuel de droite montre les taux de changement de l’EMU avec l’incertitude au fil du temps.  Le taux de changement fait référence à la différence annuelle entre les observations.  Par exemple, le taux de variation de l’EMU en 2023 est la différence entre l’EMU de 2023 et l’EMU de 2022."
+    }
+
     # plotting EMU data
     emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu, colour = "EMU with standard deviation bars")) +
       #geom_line(mcpr_plot_data, mapping = aes(year, mcpr, linetype = "FPET2 mCPR")) +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu - sd_emu, ymax = emu + sd_emu, colour = "EMU with standard deviation bars")) +
       theme_bw() +
-      labs(x = "Year", y = "EMU", colour = "Data type", linetype = " ", caption = , caption = "Left visual shows both EMU with uncertainty (shown using standard deviation error bars). \n The uncertainty associated with EMU is due to the uncertainty \nassociated with the private sector adjustment factor in the SS-to-EMU calculation process.") + ggtitle("EMU over time") + theme(legend.position = "top")
+      labs(x = "Year", y = "EMU", colour = "Data type", linetype = " ", caption = emu_plot_caption) + ggtitle("EMU over time") + theme(legend.position = "top")
 
     # plotting delta EMU data
     delta_emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu_roc)) +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc)) +
       #geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "annual change in mCPR")) +
-      theme_bw() + labs(x = "Year", colour = "Data type", y = "Rate of Change", linetype = " ", shape = " ", caption = "Right visual shows rates of change in EMU with uncertainty (shown using standard deviation error bars).\n Rate of change refers to the annual difference between observations. \nFor example, the EMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU.")  + ggtitle("Annual changes in EMU over time") + theme(legend.position = "top")
+      theme_bw() + labs(x = "Year", colour = "Data type", y = "Rate of Change", linetype = " ", shape = " ", caption = delta_plot_caption)  + ggtitle("Annual changes in EMU over time") + theme(legend.position = "top")
 
   }
 
   else {
+
+    if(language == "English"){
+      emu_plot_caption <- "Left visual shows EMU with uncertainty and FPET2 mCPR over time. EMU uncertainty is due to the\nuncertainty associated with the private sector adjustment in the SS-to-EMU calculation process."
+      delta_plot_caption <-"Right visual shows rates of change in EMU with uncertainty and rates of change in FPET2 mCPR\nover time. Rate of change refers to the annual difference between observations. For example, the\nEMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU."
+    }
+    else {
+      emu_plot_caption <- "Le visuel de gauche montre l'EMU avec incertitude et le TPCm dans FPET2 au fil du temps.  L’incertitude liée à l’UEM est due à l’incertitude associée à l’ajustement du secteur privé dans le processus de calcul d'outil SS to EMU.
+"
+      delta_plot_caption <- "Le visuel de droite montre les taux de changement de l’EMU avec l’incertitude et les taux de changement de TPCm dans FPET2 au fil du temps.  Le taux de changement fait référence à la différence annuelle entre les observations.  Par exemple, le taux de variation de l’EMU en 2023 est la différence entre l’EMU de 2023 et l’EMU de 2022."
+    }
     mcpr_plot_data <- mcpr_data %>% filter(year %in% emu_years) %>% mutate(mcpr_roc = mcpr - lag(mcpr))
 
     # plotting EMU data
@@ -52,7 +73,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
       geom_point(mcpr_plot_data, mapping = aes(year, mcpr, colour = "mCPR (FPET2)")) +
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu - sd_emu, ymax = emu + sd_emu, colour = "EMU with \nstandard deviation bars"), width = 0.5) +
       theme_bw() +
-      labs(x = "Year", y = "EMU", colour = " ", linetype = " ", caption = "Left visual shows EMU with uncertainty and FPET2 mCPR over time. EMU uncertainty is due to the\nuncertainty associated with the private sector adjustment in the SS-to-EMU calculation process.") +
+      labs(x = "Year", y = "EMU", colour = " ", linetype = " ", caption = emu_plot_caption) +
       ggtitle("EMU and mCPR over time") + theme(legend.position = "top") + guides(linetype = "none")
 
     # plotting delta EMU data
@@ -61,7 +82,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
       geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc, colour = "Rates of change in EMU \n(with standard deviation bars)"), width = 0.5) +
       geom_line(mcpr_plot_data, mapping = aes(year, mcpr_roc, linetype = "Rates of change in mCPR (FPET2)", colour = "Rates of change in mCPR (FPET2)")) +
       geom_point(mcpr_plot_data, mapping = aes(year, mcpr_roc, colour = "Rates of change in mCPR (FPET2)")) +
-      theme_bw() + labs(x = "Year", colour = " ", y = "Rate of Change", linetype = " ", shape = " ", caption = "Right visual shows rates of change in EMU with uncertainty and rates of change in FPET2 mCPR\nover time. Rate of change refers to the annual difference between observations. For example, the\nEMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU.")  +
+      theme_bw() + labs(x = "Year", colour = " ", y = "Rate of Change", linetype = " ", shape = " ", caption = delta_emu_caption)  +
       ggtitle("Rates of change in EMU and mCPR over time") +
       theme(legend.position = "top") +
       guides(linetype = "none")
