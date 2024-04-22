@@ -36,14 +36,14 @@ run_subnational <- function(subnational_tools_filepath, input_shiny_type){
     rename("ISO code"=division_numeric_code,	"Country" = name,	"SS type"= ss_type,	"Year" = year,	"PopType" = pop_type,
            EMU = emu,	SD_EMU = sd_emu,	EMU_ROC = emu_roc, SD_EMU_ROC =	sd_emu_roc)
 
-  country_name <- all_emu_output %>% pull(name) %>% unique()
+  country_name <- all_emu_output %>% pull(Country) %>% unique()
 
   write.csv(all_emu_output, paste0(subnational_tools_filepath, "/", country_name, "_subnational_data.csv"), row.names = F, na="")
 
   output_pdf_path <- paste0(subnational_tools_filepath, "/", country_name, "_subnational_plots.pdf")
+
   # Open a PDF device
   pdf(output_pdf_path, width = 12, height = 8)
-
   # Loop through each combined plot and print to the PDF
   for (combined_mod_plot in plot) {
     print(combined_mod_plot)
