@@ -393,6 +393,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     users_inc_private_sector_df_fixed <- users_adj_df_fixed %>%
       mutate(fixed_inv_adj_factor = ifelse(is.na(fixed_inv_adj_factor), 1, fixed_inv_adj_factor)) %>%
       mutate(total_users = current_users*fixed_inv_adj_factor) %>% filter(total_users > 0)
+
   }
   # ----------------------------------------------------------------------------
   return(list(users_incl_private = users_inc_private_sector_df,
