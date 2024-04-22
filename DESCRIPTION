@@ -18,7 +18,8 @@ Imports:
   tidyr,
   tidyverse,
   ggplot2,
-  patchwork
+  patchwork,
+  readr
 Depends: 
     R (>= 2.10)
 LazyData: true
