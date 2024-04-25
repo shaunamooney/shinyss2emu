@@ -19,7 +19,7 @@ run_subnational <- function(subnational_tools_filepath, input_shiny_type){
   for (i in 1:length(region_files)) {
     print(region_files[i])
     tools_info[[i]] <- get_shiny_tools_info(country_file_path = paste0(subnational_tools_filepath, "/",region_files[i]), input_shiny_type)
-    emu_output[[i]] <- country_ss_to_emu(tools_info[[i]], method_summary = FALSE)
+    emu_output[[i]] <- country_ss_to_emu(tools_info[[i]], input_shiny_type, method_summary = FALSE)
 
     emu_dataset[[i]] <- emu_output[[i]]
 

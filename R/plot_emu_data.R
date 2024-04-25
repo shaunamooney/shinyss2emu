@@ -83,11 +83,12 @@ plot_emu_data <- function(emu_data, mcpr_data){
       emu_plot_title <- "EMU with uncertainty over time"
       delta_plot_title <- "Rate of change over time"
       x_axis <- "Year"
+      y_axis <- "EMU"
       y_axis_delta <- "Rate of change"
       colour_type <- "Data type"
       mcpr_desc <- "mCPR (FPET2)"
       emu_w_uncertainty <- "EMU with uncertainty\n(standard deviation bars)"
-      emu_colour_data <- "Rate of change in EMU\nwith uncertainty"
+      emu_colour_delta <- "Rate of change in EMU\nwith uncertainty"
       mcpr_colour_delta <- "Rate of change in mCPR (FPET2)"
 
     }
