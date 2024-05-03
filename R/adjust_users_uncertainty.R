@@ -102,7 +102,6 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
   if(nrow(supply_share_sd) > 0) {
 
-  browser()
   model_input <- left_join(FP_source_data_temp, supply_share_sd %>% mutate(method_overview = as.character(method_overview)))
 
 
@@ -350,14 +349,10 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     users_inc_private_sector_df_fixed <- users_inc_private_sector_df %>% select(-sample_id)
 
     inverse_adjustment_table <- NULL
-
-
   }
 
   else {
     inverse_adjustment_table <- adj_factor_table %>%
-     #mutate(adj_factor = ifelse(adj_factor > 1, 1, ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor)))) %>%
-     #mutate(adj_factor = ifelse(adj_factor == 0, 1, ifelse(is.na(adj_factor), 1, adj_factor))) %>% # COME BACK TO THIS
       mutate(inv_adj_factor = 1/adj_factor)
 
     users_adj_df <- full_join(inverse_adjustment_table, users_table_overview_fixed)
