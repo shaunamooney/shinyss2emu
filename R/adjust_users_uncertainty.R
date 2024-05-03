@@ -28,11 +28,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     country_name <- "Cote d'Ivoire"
   }
 
-  if(country_name == "DR Congo"){
-    country_name <- "Congo Democratic Republic"
-  }
-
-  country_fp_source_data <- long_fp_source_data %>% filter(Country == country_name) %>% filter(year %in% emu_years)
+  country_fp_source_data <- fp_source_data_wide %>% filter(Country == country_name) %>% filter(year %in% emu_years)
 
   FP_source_data_temporal <- country_fp_source_data %>%
     mutate(method_overview = ifelse(method_overview == "OC Pills", "Pill",
@@ -88,6 +84,11 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
   FP_source_data_long <- FP_source_data_long %>% mutate(sector_category = ifelse(sector == "Public Medical Sector", "public",
                                                                                  ifelse(sector %in% c("NGO", "Private Hospital/ Clinic Delivery", "Pharmacy"), "private", "other"))) %>% mutate(name = Country)
+
+  if(country_name == "DR Congo"){
+    country_name <- "Congo Democratic Republic"
+  }
+
   supply_share_sd <- supply_share_sd %>%
     mutate(year = floor(average_year)) %>%
     filter(name == country_name) %>%
@@ -101,6 +102,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
   if(nrow(supply_share_sd) > 0) {
 
+  browser()
   model_input <- left_join(FP_source_data_temp, supply_share_sd %>% mutate(method_overview = as.character(method_overview)))
 
 
