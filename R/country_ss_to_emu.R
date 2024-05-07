@@ -153,7 +153,7 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
            sd_emu = signif(sd_emu, 4),
            sd_emu_roc = signif(sd_emu_roc, 4),
            Region = region_name
-          )
+          ) %>% mutate(sd_emu_roc = ifelse(is.na(sd_emu_roc), 0, sd_emu_roc))
 
   return(overall_emu)
 }
