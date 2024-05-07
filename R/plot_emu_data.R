@@ -27,6 +27,9 @@ plot_emu_data <- function(emu_data, mcpr_data){
 
   if(nrow(mcpr_data) == 0){
 
+    # no mcpr data to pull from, will have to come back to a fix for this
+    language <- "English"
+
     if(language == "English"){
       emu_plot_caption <- "Left visual shows EMU with uncertainty (shown using standard deviation error bars). \n The uncertainty associated with EMU is due to the uncertainty \nassociated with the private sector adjustment factor in the SS-to-EMU calculation process."
       delta_plot_caption <-"Right visual shows rates of change in EMU with uncertainty (shown using standard deviation error bars).\n Rate of change refers to the annual difference between observations. \nFor example, the EMU rate of change in 2023 is the difference between the 2023 EMU and 2022 EMU."

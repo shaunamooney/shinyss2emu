@@ -109,6 +109,9 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     else if(Country == "Lao PDR"){
       country_name <- "Lao People's Democratic Republic"
     }
+    else if(Country == "Micronesia"){
+      country_name <- "Micronesia (Federated States of)"
+    }
     else {
       country_name <- Country
     }
