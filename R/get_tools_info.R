@@ -12,7 +12,6 @@
 
 get_tools_info <- function(country_file_path){
 
-  #browser()
   # Country level information ------------------------------------------------
 
   # Pop_Prev tab
@@ -57,6 +56,19 @@ get_tools_info <- function(country_file_path){
     pop_dataset$population <- pop_data
     pop_dataset <- pop_dataset %>%
       tidyr::drop_na(year) %>% dplyr::select(year, population) %>% dplyr::mutate(population = as.numeric(unlist(population))) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
+
+    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...11) %>% dplyr::pull(...11) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+
+    if(set_up_table$AW_or_MW == "AW")
+    {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_aw) %>%
+        mutate(year = pop_dataset$year)
+    }
+    else {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_mw) %>%
+        mutate(year = pop_dataset$year)
+    }
   } else if (set_up_table$language == "Francais") {
     pop_sheet_data <- readxl::read_excel(country_file_path, sheet = pop_sheet)
     pop_col_index <- which(colnames(pop_sheet_data) == "Configuration : Entrez les Données Générales") + 1
@@ -67,6 +79,19 @@ get_tools_info <- function(country_file_path){
       tidyr::drop_na(year) %>%
       dplyr::select(year, population) %>%
       dplyr::mutate(population = as.numeric(unlist(population))) %>% dplyr::mutate(pop_type = set_up_table$AW_or_MW)
+
+    mcpr_mw <- pop_sheet_data %>% tidyr::drop_na(...11) %>% dplyr::pull(...11) %>% as.numeric() %>% .[complete.cases(.)]
+    mcpr_aw <- pop_sheet_data %>% tidyr::drop_na(...12) %>% dplyr::pull(...12) %>% as.numeric() %>% .[complete.cases(.)]
+
+    if(set_up_table$AW_or_MW == "AW")
+    {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_aw) %>%
+        mutate(year = pop_dataset$year)
+    }
+    else {
+      fpet_mcpr_data <- tibble(mcpr = mcpr_mw) %>%
+        mutate(year = pop_dataset$year)
+    }
   }
   country_name <- set_up_table$Country
   language <- set_up_table$language
@@ -134,7 +159,7 @@ get_tools_info <- function(country_file_path){
   # FPsource - Sectors Reporting ---------------------------------------------
   test_sheet4 <- as.matrix(read_excel(country_file_path, sheet = "4. FPSource Set Up"))
 
-  user_input_adjustment_table <- tibble(method_overview = test_sheet4[168:189,3], include_adjustment = test_sheet4[168:189,8]) %>% drop_na(method_overview) %>% distinct()
+  user_input_adjustment_table <- NULL # need to fix this to update for more recent SS-to-EMU tools
 
 
   # Pattern to be matched
@@ -944,18 +969,6 @@ get_tools_info <- function(country_file_path){
 
   condoms_include_df <- rbind(clients_condoms, fac_condoms, users_condoms, visits_condoms) %>% rename(include_exclude_condoms = 1)
 
-  user_input_adjustment_table <- user_input_adjustment_table %>% mutate(method_overview = ifelse(method_overview == "Stérilisation (F)", "Sterilization (F)",
-                                                                                                 ifelse(method_overview == "Stérilisation (M)", "Sterilization (M)",
-                                                                                                        ifelse(method_overview == "DIU", "IUD",
-                                                                                                               ifelse(method_overview == "Produits injectables", "Injectable",
-                                                                                                                      ifelse(method_overview == "Pilule", "Pill",
-                                                                                                                             ifelse(method_overview == "Préservatifs (M)", "Condom (M)",
-                                                                                                                                    ifelse(method_overview == "Préservatifs (F)", "Condom (F)",
-                                                                                                                                           ifelse(method_overview == "Autres Méthodes Modernes", "Other Modern Methods",
-                                                                                                                                                  ifelse(method_overview == "Contraception d'urgence", "Emergency contraception", method_overview)))))))))) %>%
-    mutate(include_adjustment = ifelse(include_adjustment == "Oui", "Yes",
-                                       ifelse(include_adjustment == "Non", "No", include_adjustment)))
-
   condoms_include_df <- condoms_include_df %>% mutate(include_exclude_condoms = ifelse(grepl("exc", ignore.case = TRUE, include_exclude_condoms), "Exclude Condoms", "Include Condoms"))
 
   return(list(
@@ -972,6 +985,7 @@ get_tools_info <- function(country_file_path){
     cyp_table = cyp_table,
     method_continuation_data = clients_method_continuation,
     user_input_adjustment_table = user_input_adjustment_table,
-    include_condoms_df = condoms_include_df
+    include_condoms_df = condoms_include_df,
+    fpet_mcpr_data = fpet_mcpr_data
   ))
 }

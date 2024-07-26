@@ -28,7 +28,8 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     country_name <- "Cote d'Ivoire"
   }
 
-  country_fp_source_data <- fp_source_data_wide %>% filter(Country == country_name) %>% filter(year %in% emu_years)
+
+  country_fp_source_data <- fp_source_data_wide %>% filter(Country == country_name) #%>% filter(year %in% emu_years)
 
   FP_source_data_temporal <- country_fp_source_data %>%
     mutate(method_overview = ifelse(method_overview == "OC Pills", "Pill",
@@ -89,15 +90,18 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     country_name <- "Congo Democratic Republic"
   }
 
+  # & year %in% emu_years
   supply_share_sd <- supply_share_sd %>%
     mutate(year = floor(average_year)) %>%
     filter(name == country_name) %>%
-    filter(year %in% emu_years) %>%
-    mutate(method_overview = ifelse(method_overview == "Implants", "Implant",
-                                    ifelse(method_overview == "Injectables", "Injectable",
-                                           ifelse(method_overview == "OC Pills", "Pill",
-                                                  ifelse(method_overview == "EC", "Emergency contraception",
-                                                         ifelse(method_overview == "Female Sterilization", "Sterilization (F)", method_overview))))))
+    mutate(method_overview = case_when(
+      method_overview == "Implants" ~ "Implant",
+      method_overview == "Injectables" ~ "Injectable",
+      method_overview == "OC Pills" ~ "Pill",
+      method_overview == "EC" ~ "Emergency contraception",
+      method_overview == "Female Sterilization" ~ "Sterilization (F)",
+      TRUE ~ method_overview
+    ))
 
 
   if(nrow(supply_share_sd) > 0) {
@@ -106,10 +110,11 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
 
 
-  no_model_methods <- model_input %>% filter(sd_logit_pub %>% is.na()) %>% pull(method_overview) %>% unique()
+  # THIS IS A BUG
+  model_methods <- supply_share_sd %>% pull(method_overview) %>% unique()
 
   FP_source_no_mod_est <- FP_source_data_temp1 %>%
-    filter(method_overview %in% no_model_methods) %>%
+    filter(!(method_overview %in% model_methods)) %>%
     select(method_overview, year, `Public Medical Sector`,
                                                           `NGO`,
                                                           `Private Hospital/ Clinic Delivery`,
@@ -193,12 +198,12 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
   supply_share_mod_res <- left_join(supply_share_mod_res_temp, model_input)
 
   FP_source_data_samples <- supply_share_mod_res %>%
-    mutate(`Public Medical Sector` = public,
-           `NGO` = private*ngo_prop,
-           `Private Hospital/ Clinic Delivery` = private*private_hosp_prop,
-           `Pharmacy` = private*pharmacy_prop,
-           `Shop/ Church/ Friend` = other*shop_prop,
-           Other = other*other_prop) %>% select(sample_id,
+    mutate(`Public Medical Sector` = pub_share_sample,
+           `NGO` = priv_share_sample*ngo_prop,
+           `Private Hospital/ Clinic Delivery` = priv_share_sample*private_hosp_prop,
+           `Pharmacy` = priv_share_sample*pharmacy_prop,
+           `Shop/ Church/ Friend` = other_share_sample*shop_prop,
+           Other = other_share_sample*other_prop) %>% select(sample_id,
                                                 method_overview,
                                                 year,
                                                 `Public Medical Sector`,
@@ -249,8 +254,9 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
    select(sample_id, Sector, Presence_recode_sample) %>%
    rename(sector = Sector)
 
- FP_source_data_samples_join <- left_join(FP_source_data_samples_long, sector_data)
+ FP_source_data_samples_join <- left_join(FP_source_data_samples_long, sector_data %>% drop_na(sector))
 
+ #browser()
  adj_factor_table <- FP_source_data_samples_join %>%
                           mutate(method_adj = supply_share_sample*Presence_recode_sample) %>%
                           group_by(sample_id, year, method_overview) %>%
@@ -267,7 +273,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
                    names_to = "year",
                    values_to = "count") %>%
       mutate(year = as.numeric(year)) %>%
-      mutate(current_users = count) %>% mutate(method_overview = ifelse(method_detail == "Tubal Ligation (F)", "Sterilization (F)",
+      mutate(year_index = NA, current_users = count) %>% mutate(method_overview = ifelse(method_detail == "Tubal Ligation (F)", "Sterilization (F)",
                                                                         ifelse(method_detail == "Male Condom", "Condom (M)", method_overview)))
 
   }
@@ -361,6 +367,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
       drop_na(count)
 
     users_adj_df_no_inv_adj <- users_adj_df %>% filter(is.na(inv_adj_factor)) %>% select(-sample_id)
+    users_adj_df <- users_adj_df %>% filter(!is.na(sample_id))
     n_now_na_inv_adj <- nrow(users_adj_df_no_inv_adj)
     if(n_now_na_inv_adj > 0){
       users_adj_df_no_inv_adj <- users_adj_df_no_inv_adj %>%
@@ -376,13 +383,14 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
     users_adj_df_fixed <- users_adj_df_fixed %>%
       drop_na(count)
 
-    user_input_no_adjustment_methods <- user_input_adjustment_table %>% filter(include_adjustment == "No") %>% pull(method_overview)
+    if(!is.null(user_input_adjustment_table)){
+      user_input_no_adjustment_methods <- user_input_adjustment_table %>% filter(include_adjustment == "No") %>% pull(method_overview)
 
-    if(length(user_input_no_adjustment_methods) > 0 ){
-      users_adj_df <- users_adj_df %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
-      users_adj_df_fixed <- users_adj_df_fixed %>% mutate(fixed_inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, fixed_inv_adj_factor))
-    }
-
+      if(length(user_input_no_adjustment_methods) > 0 ){
+        users_adj_df <- users_adj_df %>% mutate(inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, inv_adj_factor))
+        users_adj_df_fixed <- users_adj_df_fixed %>% mutate(fixed_inv_adj_factor = ifelse(method_overview %in% user_input_no_adjustment_methods, 1, fixed_inv_adj_factor))
+      }
+  }
     users_inc_private_sector_df <- users_adj_df %>%
       mutate(inv_adj_factor = ifelse(is.na(inv_adj_factor), 1, inv_adj_factor)) %>%
       mutate(total_users = current_users*inv_adj_factor) %>% filter(total_users > 0)
@@ -392,9 +400,12 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
       mutate(total_users = current_users*fixed_inv_adj_factor) %>% filter(total_users > 0)
 
   }
+
   # ----------------------------------------------------------------------------
   return(list(users_incl_private = users_inc_private_sector_df,
               user_incl_private_fixed = users_inc_private_sector_df_fixed,
               inverse_adjustment_table = inverse_adjustment_table,
-              commodities_table = commodities_table))
+              commodities_table = commodities_table,
+              supply_share_mod_res = supply_share_mod_res,
+              FP_source_data_samples = FP_source_data_samples))
 }

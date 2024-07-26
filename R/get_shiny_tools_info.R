@@ -72,11 +72,11 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     if(set_up_table$AW_or_MW == "AW")
     {
       fpet_mcpr_data <- tibble(mcpr = mcpr_aw) %>%
-        mutate(year = 2005 + row_number() - 1)
+        mutate(year = pop_dataset$year )
     }
     else {
       fpet_mcpr_data <- tibble(mcpr = mcpr_mw) %>%
-        mutate(year = 2005 + row_number() - 1)
+        mutate(year = pop_dataset$year)
     }
   } else if (set_up_table$language == "Francais") {
     pop_sheet_data <- readxl::read_excel(country_file_path, sheet = pop_sheet)
@@ -95,11 +95,11 @@ get_shiny_tools_info <- function(country_file_path, shiny_input_type){
     if(set_up_table$AW_or_MW == "AW")
     {
       fpet_mcpr_data <- tibble(mcpr = mcpr_aw) %>%
-        mutate(year = 2005 + row_number() - 1)
+        mutate(year = pop_dataset$year)
     }
     else {
       fpet_mcpr_data <- tibble(mcpr = mcpr_mw) %>%
-        mutate(year = 2005 + row_number() - 1)
+        mutate(year = pop_dataset$year)
     }
   }
   country_name <- set_up_table$Country

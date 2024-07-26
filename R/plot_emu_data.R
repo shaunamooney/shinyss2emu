@@ -41,7 +41,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
       mcpr_desc <- "mCPR (FPET2)"
       emu_w_uncertainty <- "EMU with uncertainty\n(standard deviation bars)"
       colour_type <- "Data type"
-      emu_colour_data <- "Rate of change in EMU"
+      emu_colour_data <- "Rate of change in EMU\n(with standard deviation bars)"
 
     }
     else {
@@ -61,7 +61,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
     # plotting EMU data
     emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu, colour = emu_w_uncertainty)) +
-      geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu - sd_emu, ymax = emu + sd_emu, colour = emu_w_uncertainty)) +
+      geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu - sd_emu, ymax = emu + sd_emu, colour = emu_w_uncertainty), width = 0.15) +
       theme_bw() +
       labs(x = x_axis, y = y_axis, colour = colour_type, linetype = " ", caption = emu_plot_caption) +
       ggtitle(emu_plot_title) +
@@ -70,7 +70,7 @@ plot_emu_data <- function(emu_data, mcpr_data){
     # plotting delta EMU data
     delta_emu_plot <- ggplot() +
       geom_point(emu_data, mapping = aes(year, emu_roc, colour = emu_colour_data)) +
-      geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc, colour = emu_colour_data)) +
+      geom_errorbar(emu_data, mapping = aes(x = year, ymin = emu_roc - sd_emu_roc, ymax = emu_roc + sd_emu_roc, colour = emu_colour_data), width = 0.15) +
       theme_bw() +
       labs(x = x_axis, colour = colour_type, y = y_axis_delta, linetype = " ", shape = " ", caption = delta_plot_caption) +
       ggtitle(delta_plot_title) +
