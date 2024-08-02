@@ -159,7 +159,41 @@ get_tools_info <- function(country_file_path){
   # FPsource - Sectors Reporting ---------------------------------------------
   test_sheet4 <- as.matrix(read_excel(country_file_path, sheet = "4. FPSource Set Up"))
 
-  user_input_adjustment_table <- NULL # need to fix this to update for more recent SS-to-EMU tools
+  # 2024 SS-to-EMU tool update includes user inputted table on whether or not to adjust each method (old doesn't but still want old SS-to-EMU tools to work)
+  # Get the number of rows and columns
+  sheet_n_rows <- nrow(test_sheet4)
+  sheet_n_cols <- ncol(test_sheet4)
+
+  # Define the row and column indices to check
+  row_start <- 168
+  row_end <- 189
+  col_index1 <- 3
+  col_index2 <- 8
+
+  # Check if the indices are out of bounds
+  test <- (row_end <= sheet_n_rows && col_index1 <= sheet_n_cols && col_index2 <= sheet_n_cols)
+
+  if(test == TRUE){
+
+    user_input_adjustment_table <- tibble(method_overview = test_sheet4[168:189,3], include_adjustment = test_sheet4[168:189,8]) %>% drop_na(method_overview) %>% distinct()
+
+    user_input_adjustment_table <- user_input_adjustment_table %>% mutate(method_overview = ifelse(method_overview == "Stérilisation (F)", "Sterilization (F)",
+                                                                                                   ifelse(method_overview == "Stérilisation (M)", "Sterilization (M)",
+                                                                                                          ifelse(method_overview == "DIU", "IUD",
+                                                                                                                 ifelse(method_overview == "Produits injectables", "Injectable",
+                                                                                                                        ifelse(method_overview == "Pilule", "Pill",
+                                                                                                                               ifelse(method_overview == "Préservatifs (M)", "Condom (M)",
+                                                                                                                                      ifelse(method_overview == "Préservatifs (F)", "Condom (F)",
+                                                                                                                                             ifelse(method_overview == "Autres Méthodes Modernes", "Other Modern Methods",
+                                                                                                                                                    ifelse(method_overview == "Contraception d'urgence", "Emergency contraception", method_overview)))))))))) %>%
+      mutate(include_adjustment = ifelse(include_adjustment == "Oui", "Yes",
+                                         ifelse(include_adjustment == "Non", "No", include_adjustment)))
+  }
+
+  else
+    {
+      user_input_adjustment_table <- NULL # need to fix this to update for more recent SS-to-EMU tools
+    }
 
 
   # Pattern to be matched

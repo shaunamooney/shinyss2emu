@@ -1,15 +1,14 @@
 Package: shinyss2emu
-Title: This package calculates Estimated Modern Use with uncertainty using service statistics data as input.
+Title: This package calculates Estimated Modern Use with uncertainty using service statistics data as input
 Version: 0.0.0.9000
 Authors@R: 
     person("Shauna", "Mooney", , "shauna.mooney.2015@mumail.ie", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: This package calculates Estimated Modern Use, a family planning indicator, with uncertainty using family planning service statistics data as input.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: use_mit_license()
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
   R2jags,
   dplyr,
