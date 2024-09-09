@@ -359,6 +359,18 @@ get_tools_info <- function(country_file_path){
   #reporting_rates <- reporting_rates_table(reporting_rates_data, s)
 
 
+  val_type <- emu_output_sheet_data[80,7]
+
+  ss_val_type <- ifelse(grepl("Utilisatrices", val_type, ignore.case = TRUE), "users",
+                          ifelse(grepl("Utilisateurs", val_type, ignore.case = TRUE), "users",
+                                 ifelse(grepl("clients", val_type, ignore.case = TRUE), "clients",
+                                        ifelse(grepl("visites", val_type, ignore.case = TRUE), "visits",
+                                               ifelse(grepl("établissements", val_type, ignore.case = TRUE), "facilities",
+                                                      ifelse(grepl("facilities", val_type, ignore.case = TRUE), "facilities",
+                                                             ifelse(grepl("users", val_type, ignore.case = TRUE), "users",
+                                                                    ifelse(grepl("visits", val_type, ignore.case = TRUE), "visits", NA))))))))
+
+  #browser()
   # SS type input data
 
   # Service statistics info data
@@ -1020,6 +1032,7 @@ get_tools_info <- function(country_file_path){
     method_continuation_data = clients_method_continuation,
     user_input_adjustment_table = user_input_adjustment_table,
     include_condoms_df = condoms_include_df,
-    fpet_mcpr_data = fpet_mcpr_data
+    fpet_mcpr_data = fpet_mcpr_data,
+    ss_val_type = ss_val_type
   ))
 }

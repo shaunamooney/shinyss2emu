@@ -44,6 +44,7 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     ss_info <- ss_tools_info$ss_info %>% filter(ss_type == s)
     cyp_table <- ss_tools_info$cyp_table %>% filter(ss_type == s)
     reporting_rates <- ss_tools_info$reporting_rates_table %>% filter(ss_type == s)
+    ss_val_type <- ss_tools_info$ss_val_type
 
     if(s != "FP users"){
     long_term_rates <- ss_tools_info$method_continuation_data %>%
@@ -187,7 +188,8 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
            sd_emu = signif(sd_emu, 4),
            sd_emu_roc = signif(sd_emu_roc, 4),
            Region = region_name
-          ) %>% mutate(sd_emu_roc = ifelse(is.na(sd_emu_roc), 0, sd_emu_roc))
+          ) %>% mutate(sd_emu_roc = ifelse(is.na(sd_emu_roc), 0, sd_emu_roc),
+                       ss_val_type = ss_val_type)
 
   if(country_analysis == TRUE){
     return(list(sector_share_samples = all_sector_share_samples,
