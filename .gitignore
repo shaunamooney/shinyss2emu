@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+demo/country_analysis_script.R
+.DS_Store

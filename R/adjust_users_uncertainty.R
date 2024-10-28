@@ -110,7 +110,6 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
 
 
-  # THIS IS A BUG
   model_methods <- supply_share_sd %>% pull(method_overview) %>% unique()
 
   FP_source_no_mod_est <- FP_source_data_temp1 %>%
@@ -256,7 +255,6 @@ adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up,
 
  FP_source_data_samples_join <- left_join(FP_source_data_samples_long, sector_data %>% drop_na(sector))
 
- #browser()
  adj_factor_table <- FP_source_data_samples_join %>%
                           mutate(method_adj = supply_share_sample*Presence_recode_sample) %>%
                           group_by(sample_id, year, method_overview) %>%

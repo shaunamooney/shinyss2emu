@@ -1,5 +1,5 @@
 #' Running subnational shinyss2emu for subnational levels. Saves a CSV file and a pdf in the specified directory.
-#' @name adjust_users_uncertainty
+#' @name run_subnational
 #' @param subnational_tools_filepath The filepath in which all individual subnational SS-to-EMU tools are located.
 #' @param input_shiny_type The service statistics type to use.
 #' @return a list containing an emu database and a list of plots.
