@@ -3,12 +3,12 @@
 #' @param country_tools_info Country tools info (get_tools_info() output)
 #' @param shiny_input_type The chosen service type (in the Shiny UI)
 #' @param method_summary Summarise by method or not (TRUE/FALSE)
-#' @param country_analysis Save samples for analysis (TRUE/FALSE)
+#' @param save_samples Save samples for analysis (TRUE/FALSE)
 #' @import tidyverse
 #' @import stringr
 #' @export
 
-country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, method_summary = FALSE, country_analysis = FALSE){
+country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, method_summary = FALSE, save_samples = FALSE){
 
   ss_tools_info <- country_tools_info
   country_emu_df <- list()
@@ -191,7 +191,7 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
           ) %>% mutate(sd_emu_roc = ifelse(is.na(sd_emu_roc), 0, sd_emu_roc),
                        ss_val_type = ss_val_type)
 
-  if(country_analysis == TRUE){
+  if(save_samples == TRUE){
     return(list(sector_share_samples = all_sector_share_samples,
                 facility_share_samples = all_facility_share_samples,
                 private_sector_adj_samples = all_private_sector_adj_samples,

@@ -1,5 +1,5 @@
 Package: shinyss2emu
-Title: This package calculates Estimated Modern Use with uncertainty using service statistics data as input
+Title: Calculate Estimated Modern Use with Uncertainty
 Version: 0.0.0.9000
 Authors@R: 
     person("Shauna", "Mooney", , "shauna.mooney.2015@mumail.ie", role = c("aut", "cre"),

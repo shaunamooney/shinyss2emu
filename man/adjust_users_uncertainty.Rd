@@ -6,7 +6,6 @@
 \usage{
 adjust_users_uncertainty(
   sectors_reporting_input,
-  my_country_set_up,
   reporting_rates_df,
   baseline_users,
   commodities_table,
@@ -16,8 +15,6 @@ adjust_users_uncertainty(
 }
 \arguments{
 \item{sectors_reporting_input}{A table of values indicating if a sector is fully/partial/non-reporting.}
-
-\item{my_country_set_up}{A table of primary country information.}
 
 \item{reporting_rates_df}{A table of reporting rates for your chosen ss_type}
 

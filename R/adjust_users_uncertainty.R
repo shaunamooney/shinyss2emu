@@ -1,7 +1,6 @@
 #' Adjusting quantity data to reflect users with uncertainty.
 #' @name adjust_users_uncertainty
 #' @param sectors_reporting_input A table of values indicating if a sector is fully/partial/non-reporting.
-#' @param my_country_set_up A table of primary country information.
 #' @param reporting_rates_df A table of reporting rates for your chosen ss_type
 #' @param baseline_users A table of baseline users calculated for the years prior to your chosen ss_type data.
 #' @param commodities_table A table of commodities for your chosen service statistic type
@@ -12,7 +11,7 @@
 #' @export
 #'
 
-adjust_users_uncertainty <- function(sectors_reporting_input, my_country_set_up, reporting_rates_df, baseline_users, commodities_table, method_continuation_df, user_input_adjustment_table) {
+adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df, baseline_users, commodities_table, method_continuation_df, user_input_adjustment_table) {
 
   s <- reporting_rates_df %>% pull(ss_type) %>% unique()
 
