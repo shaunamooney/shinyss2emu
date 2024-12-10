@@ -28,7 +28,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
   }
 
 
-  country_fp_source_data <- fp_source_data_wide %>% filter(Country == country_name) #%>% filter(year %in% emu_years)
+  country_fp_source_data <- fp_source_data_wide %>% filter(name == country_name) #%>% filter(year %in% emu_years)
 
   FP_source_data_temporal <- country_fp_source_data %>%
     mutate(method_overview = ifelse(method_overview == "OC Pills", "Pill",
@@ -68,7 +68,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
 
 
   FP_source_data_long <- FP_source_data_temporal %>%
-    pivot_longer(cols = c(-method_overview, -Country, -year, -Survey, -Population), names_to = "sector", values_to = "supply_share")
+    pivot_longer(cols = c(-method_overview, -name, -year, -survey), names_to = "sector", values_to = "supply_share")
 
   fixed_inverse_adjustment_table <- left_join(FP_source_data_long, sectors_reporting_input %>%
                                                 rename(sector = Sector) %>%
@@ -83,7 +83,7 @@ adjust_users_uncertainty <- function(sectors_reporting_input, reporting_rates_df
                                                 mutate(fixed_inv_adj_factor = 1/fixed_adj_factor)
 
   FP_source_data_long <- FP_source_data_long %>% mutate(sector_category = ifelse(sector == "Public Medical Sector", "public",
-                                                                                 ifelse(sector %in% c("NGO", "Private Hospital/ Clinic Delivery", "Pharmacy"), "private", "other"))) %>% mutate(name = Country)
+                                                                                 ifelse(sector %in% c("NGO", "Private Hospital/ Clinic Delivery", "Pharmacy"), "private", "other")))
 
   if(country_name == "DR Congo"){
     country_name <- "Congo Democratic Republic"
