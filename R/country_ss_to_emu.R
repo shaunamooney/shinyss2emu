@@ -79,7 +79,6 @@ country_ss_to_emu <- function(country_tools_info, shiny_input_type = NULL, metho
     }
 
     uncertainty_adjust <- adjust_users_uncertainty(recode_sectors_reporting,
-                                                   setup_data,
                                                    reporting_rates,
                                                    baseline_users,
                                                    ss_data,
